@@ -1,5 +1,4 @@
 import mechanize
-from bs4 import BeautifulSoup, element
 from time import localtime, strftime
 
 class wos_bot(object):
@@ -61,13 +60,9 @@ class wos_bot(object):
         self.resp = self.br.submit()
         self.nohigh()
 
-    def list_papers(self):
-        soup = BeautifulSoup(self.data, 'lxml')
-        self.papers = soup.find_all('div', {'class' : 'search-results-item'})
-
     def save(self):
         tstr = time.strftime("%y%m%d_%H:%M:%S", time.localtime()))
-        fd = codecs.open("pages/" + tstr + ".html", 'w')
+        fd = codecs.open("pages/" + tstr + ".html", 'w', 'utf-8')
         fd.write(self.data)
         fd.close()
 
