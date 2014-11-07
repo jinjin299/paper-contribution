@@ -1,4 +1,5 @@
 # coding=utf-8
+from datetime import date
 
 class paper4(object):
     def __init__(self, title=u"", authors=[], pdate=date.today(), ccnt=0):

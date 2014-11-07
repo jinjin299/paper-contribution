@@ -1,12 +1,10 @@
+# coding:utf-8
 import mechanize
 from time import localtime, strftime
 
 class wos_bot(object):
-    def __init__(self);
+    def __init__(self):
         self.br = mechanize.Browser()
-        self.br2 = mechanize.Browser()
-        self.CITED = 0
-        self.previous = ""
 
     def nohigh(self):
         self.data = self.resp.get_data()
@@ -16,6 +14,16 @@ class wos_bot(object):
                 data_str = "".join(datal[i+1].split('</span>',1))
                 datal[i+1] = data_str
             self.data = "".join(datal)
+
+    def link(self, paper):
+        link = paper.find('a', {'class' : 'smallV110'})
+        if link:
+            self.resp = self.br.follow_link(url=link.get('href'))
+            self.nohigh()
+            return True
+        else:
+            return False
+
     
     def follow_cited(self):
         for link in self.br.links():
@@ -55,14 +63,15 @@ class wos_bot(object):
         self.br['value(select1)'] = ['TI']
         self.br['period'] = ['Year Range']
         self.br['startYear'] = [year]
-        sel.fbr['endYear'] = [year]
+        self.br['endYear'] = [year]
         self.br.form.fixup()
         self.resp = self.br.submit()
         self.nohigh()
 
     def save(self):
-        tstr = time.strftime("%y%m%d_%H:%M:%S", time.localtime()))
-        fd = codecs.open("pages/" + tstr + ".html", 'w', 'utf-8')
+        tstr = strftime("%y%m%d_%H:%M:%S", localtime())
+        fd = open("pages/" + tstr + ".html", 'w')
+        #fd = codecs.open("pages/" + tstr + ".html", 'w', 'utf-8')
         fd.write(self.data)
         fd.close()
 

@@ -1,23 +1,24 @@
 # coding=utf=8
-import datetime
+from datetime import datetime
 from paper import paper4
 from bs4 import BeautifulSoup, element
 
 class analyzer(object):
     def __init__(self):
+        pass
 
-    def list_papers(self, br):
-        soup = BeautifulSoup(br.data, 'lxml')
+    def list_papers(self, data):
+        soup = BeautifulSoup(data, 'lxml')
         return soup.find_all('div', {'class' : 'search-results-item'})
 
-    def extract(self, br):
+    def extract(self, data):
         authors = []
         seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
-        soup = BeautifulSoup(br.data, 'lxml')
-        
-        ccnt = int(soup.find('span', {'class' : 'TCcountFR'}).value)
+        soup = BeautifulSoup(data, 'lxml')
+        ccnt = soup.find('span', {'class' : 'TCcountFR'}).getText(strip=True)
+        ccnt = int(ccnt)
         cont = soup.find('div', 'l-content')
-        title = cont.find('div', 'title').value.content
+        title = cont.find('div', 'title').value.contents[0].strip()
         
         for b in cont.find_all('div', 'block-record-info'):
             p_fields = b.find_all('p', 'FR_field')
@@ -37,10 +38,10 @@ class analyzer(object):
                     break
 
             if p_source:
-                for p in p_field:
+                for p in p_fields:
                     ptxt = p.getText(strip=True)
                     if ptxt.startswith("Published:"):
-                        d = p.value.content
+                        d = p.find('value').contents[0]
                         ds = d.split(" ")
                         if len(ds) == 1:
                             if "-" in d:
@@ -58,6 +59,7 @@ class analyzer(object):
                             date = datetime.strptime(d, "%b %Y")
                         else:
                             date = datetime.strptime(d, "%b %d %Y")
-                    break
-
+                        date =  date.strftime("%Y.%m.%d")
+                        break
+        
         return paper4(title, authors, date, ccnt)
