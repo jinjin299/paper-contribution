@@ -12,13 +12,41 @@ class analyzer(object):
         return soup.find_all('div', {'class' : 'search-results-item'})
 
     def extract_s(self, paper):
+        seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
         cont = paper.find('div', {'class' : 'search-results-content'})
-        for div in cont.find_all('div'):
-            print div
-        print 123
-        
+        div = cont.find('div')
+        title = div.getText(strip=True)
+
+        div = div.nextSibling.nextSibling
+        atxt = div.getText(strip=True).split("By:")[1]
+        if "et al." in atxt:
+            return False
+        authors = [x.strip() for x in atxt.split(";") if x.strip!='']
+
+        div = div.nextSibling.nextSibling
+        d = div.getText(strip=True).split('Published:')[1]
+        ds = d.split(" ")
+        if len(ds) == 1:
+            if "-" in d:
+                date = datetime.strptime(d, "%Y-%m")
+            else:
+               date = datetime.strptime(d, "%Y")
+        elif len(ds) == 2:
+            if "-" in d:
+                d = d.split("-", 1)[0] + u" " + ds[1]
+
+            elif ds[0] in seasons:
+                d = seasons[ds[0]] + u" " + ds[1]
+
+            date = datetime.strptime(d, "%b %Y")
+        else:
+            date = datetime.strptime(d, "%b %d %Y")
+        date = date.strftime("%Y.%m.%d")
+
         cont = paper.find('div', {'class' : 'search-results-data'})
-        print cont.find('a').contents[0].strip()
+        ccnt = int(cont.find('a').contents[0])
+
+        return paper4(title, authors, date, ccnt)
 
 
     def extract(self, data):

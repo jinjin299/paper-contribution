@@ -62,8 +62,9 @@ def main():
 
 def test():
     anal = analyzer()
-    fd = open("pages/141107_07:05:05.html",'r')
-    print anal.extract_s(fd.read())
+    fd = open("pages/141107_07:07:36.html",'r')
+    papers = anal.list_papers(fd.read())
+    print anal.extract_s(papers[0])
     fd.close()
 
 if __name__ == '__main__':
