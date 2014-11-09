@@ -54,6 +54,16 @@ class wos_bot(object):
         self.resp = self.br.back()
         self.nohigh()
 
+    def next(self):
+        for link in self.br.links():
+            attrs = dict(link.attrs)
+            if 'title' in attrs and attrs['title']=='Next Page':
+                self.resp = self.br.follow_link(link)
+                self.nohigh()
+                return True
+        return False
+        
+
 
     def search(self, title, year):
         self.br.open("http://apps.webofknowledge.com/")

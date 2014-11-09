@@ -11,6 +11,16 @@ class analyzer(object):
         soup = BeautifulSoup(data, 'lxml')
         return soup.find_all('div', {'class' : 'search-results-item'})
 
+    def extract_s(self, paper):
+        cont = paper.find('div', {'class' : 'search-results-content'})
+        for div in cont.find_all('div'):
+            print div
+        print 123
+        
+        cont = paper.find('div', {'class' : 'search-results-data'})
+        print cont.find('a').contents[0].strip()
+
+
     def extract(self, data):
         authors = []
         seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
@@ -59,7 +69,8 @@ class analyzer(object):
                             date = datetime.strptime(d, "%b %Y")
                         else:
                             date = datetime.strptime(d, "%b %d %Y")
-                        date =  date.strftime("%Y.%m.%d")
+                        date = date.strftime("%Y.%m.%d")
                         break
+
         
         return paper4(title, authors, date, ccnt)
