@@ -15,4 +15,10 @@ class paper4(object):
 
         tmp = u"TITLE\n%s\n\nAUTHORS\n%s\nDATE\n%s\n\nCOUNT\n%s\n\n\n\n\n"
         return tmp % (self.title, auth, self.pdate, self.ccnt)
+    
+    def __eq__(self, paper):
+        f1 = self.title == paper.title
+        f2 = self.authors == paper.authors
+        f3 = self.pdate == paper.pdate
+        return f1 and f2 and f3
 
