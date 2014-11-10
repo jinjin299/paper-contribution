@@ -21,4 +21,3 @@ class paper4(object):
         f2 = self.authors == paper.authors
         f3 = self.pdate == paper.pdate
         return f1 and f2 and f3
-

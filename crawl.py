@@ -7,6 +7,7 @@ class wos_bot(object):
         self.br = mechanize.Browser()
 
     def nohigh(self):
+        self.url = self.br.geturl()
         self.data = self.resp.get_data()
         if '<span class="hitHilite">' in self.data:
             datal = self.data.split('<span class="hitHilite">')
@@ -62,8 +63,10 @@ class wos_bot(object):
                 self.nohigh()
                 return True
         return False
-        
 
+    def go_url(self, url):
+        self.resp = self.br.open(url)
+        self.nohigh()
 
     def search(self, title, year):
         self.br.open("http://apps.webofknowledge.com/")
