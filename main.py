@@ -18,37 +18,40 @@ def project(bot, anal):
     if not bot.follow_cited():
         logging.info('No citation with %s', droot.title)
         break
-    url = bot.url
+
+    papers = anal.list_papers(bot.data)
+    bot.link(papers[0])
+
     while True:
-        papers = anal.list_papers(bot.data)
-        for p in papers:
-            bot.link(p)
-            data = anal.extract(bot.data)
-            pset.add(data)
+        url = bot.url
+        paper = anal.extract(bot.data)
+        if paper in pset:
+            logging.debug("Aleardy Exist : %s", paper.title)
+        else:
+            pset.add(anal.extract(bot.data))
+
+        if not bot.follow_ref():
+            logging.info('No Reference')
+
+        while True:
+            papers = anal.list_papers(bot.data)
+            for p in papers:
+                paper = anal.extract_s(p)
+                if paper:
+                    # We can extract data with short section
+                    break
+                
+                bot link(p)
+                paper = anal.extract(bot.data)
+                # manipulate paper
+            else:
+                if not bot.next():
+                    break
+        bot.go_url(url)
         if not bot.next():
             break
 
-    papers = anal.list_papers(bot.data)
-    for p in papers:
-        bot.link(p)
-        data = anal.extract(bot.data)
-        fd.write(data)
-        if bot.follow_ref():
-            while True:
-                papers2 = anal.list_papers(bot.data)
-                for p2 in papers2:
-                    bot.link(p2)
-                    data = anal.extract(bot.data)
-                    fd.write(data)
-                    bot.back()
-                else:
-                    if not bot.next():
-                        break
-        else:
-            print 1
-    else:
-        print 1
-    papers = anal.list_papers(bot.data)
+
 
 
 def main():
