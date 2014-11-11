@@ -50,17 +50,18 @@ def project(bot, anal):
                 bot.save()
                 logging.debug("LEVEL 3")
                 papers = anal.list_papers(bot.data)
+                n = 1
                 for p in papers:
-                    paper = anal.extract_s(p)
+                    paper = anal.extract_c(p)
                     if paper:
                         pass
-
                         # We can extract data with short section
                     if not bot.link(p):
-                        logging.debug('Access Error')
+                        logging.debug('Access Error : %s', str(n))
                         return False
                     paper = anal.extract(bot.data)
                     # manipulate paper
+                    n += 1
                 else:
                     if not bot.next():
                         break
@@ -97,9 +98,20 @@ def main():
 
 def test():
     anal = analyzer()
-    fd = open("pages/141107_07:07:36.html",'r')
+    fd = open("pages/141111_15:16:54.html", 'r')
     papers = anal.list_papers(fd.read())
-    print anal.extract_s(papers[0])
+    n = 1
+    for p in papers:
+        print n,
+        paper = anal.extract_c(p)
+        if not paper:
+            print 'Burst'
+        elif paper.title == 'Not Available':
+            print 'Not available'
+        else:
+            print 'Success'
+        n += 1
+
     fd.close()
 
 if __name__ == '__main__':
