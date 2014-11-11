@@ -54,12 +54,15 @@ def project(bot, anal):
                 for p in papers:
                     paper = anal.extract_c(p)
                     if paper:
-                        pass
+                        n += 1
+                        continue
                         # We can extract data with short section
+                    logging.debug('Check Link : %s', str(n))
                     if not bot.link(p):
                         logging.debug('Access Error : %s', str(n))
                         return False
                     paper = anal.extract(bot.data)
+                    bot.back()
                     # manipulate paper
                     n += 1
                 else:
@@ -88,7 +91,7 @@ def main():
 
     for line in fd.readlines():
         if line.startswith("#"):
-            pass
+            continue
         lst = line.strip().split("\t")
         nobel = lst[0]
         title, year = lst[1].split("  ")
