@@ -13,7 +13,7 @@ class analyzer(object):
 
     def extract_s(self, paper):
         seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
-        months = ["%02d" i for i in range(1,13)]
+        months = ["%02d"% i for i in range(1,13)]
         cont = paper.find('div', {'class' : 'search-results-content'})
         div = cont.find('div')
         title = div.getText(strip=True)
@@ -53,7 +53,7 @@ class analyzer(object):
     
     def extract_c(self, paper):
         seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
-        months = ["%02d" i for i in range(1,13)]
+        months = ["%02d"% i for i in range(1,13)]
         cont = paper.find('span', {'class' : 'reference-title'})
         if not cont:
             return paper4('Not Available', [], '', 0)
@@ -102,7 +102,7 @@ class analyzer(object):
     def extract(self, data):
         authors = []
         seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
-        months = ["%02d" i for i in range(1,13)]
+        months = ["%02d"% i for i in range(1,13)]
         soup = BeautifulSoup(data, 'lxml')
         ccnt = soup.find('span', {'class' : 'TCcountFR'}).getText(strip=True)
         ccnt = int(ccnt.replace(',', ''))
