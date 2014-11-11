@@ -21,7 +21,7 @@ def project(bot, anal):
     bot.link(papers[0])
     droot = anal.extract(bot.data)
     bot.save()
-    logging.debug("LEVEL 1")
+    logging.debug("LEVEL 1 : %s", droot.title)
     if not bot.follow_cited():
         logging.info('No citation : %s', droot.title)
         return False
@@ -87,10 +87,12 @@ def main():
     logging.info('Open list file')
 
     for line in fd.readlines():
+        if line.startswith("#"):
+            pass
         lst = line.strip().split("\t")
         nobel = lst[0]
         title, year = lst[1].split("  ")
-        logging.info('Start searching')
+        logging.info('Start searching %s', nobel)
         bot.search(title, year)
         project(bot, anal)
 

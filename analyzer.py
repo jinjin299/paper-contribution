@@ -44,8 +44,7 @@ class analyzer(object):
         date = date.strftime("%Y.%m.%d")
 
         cont = paper.find('div', {'class' : 'search-results-data'})
-        ccnt = int(cont.find('a').contents[0])
-
+        ccnt = int(cont.find('a').contents[0].replce(',', ''))
         return paper4(title, authors, date, ccnt)
     
     def extract_c(self, paper):
@@ -85,7 +84,7 @@ class analyzer(object):
         date = date.strftime("%Y.%m.%d")
 
         cont = paper.find('div', {'class' : 'search-results-data'})
-        ccnt = int(cont.find('a').contents[0])
+        ccnt = int(cont.find('a').contents[0].replace(',', ''))
 
         return paper4(title, authors, date, ccnt)
 
@@ -95,7 +94,7 @@ class analyzer(object):
         seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
         soup = BeautifulSoup(data, 'lxml')
         ccnt = soup.find('span', {'class' : 'TCcountFR'}).getText(strip=True)
-        ccnt = int(ccnt)
+        ccnt = int(ccnt.replace(',', ''))
         cont = soup.find('div', 'l-content')
         title = cont.find('div', 'title').value.contents[0].strip()
         
