@@ -103,22 +103,23 @@ def main():
 
 def test():
     anal = analyzer()
-    fd = open("pages/141111_15:16:54.html", 'r')
+    fd = open("pages/141111_19:30:10.html", 'r')
     papers = anal.list_papers(fd.read())
     n = 1
-    for p in papers:
-        print n,
-        paper = anal.extract_c(p)
-        if not paper:
-            print 'Burst'
-        elif paper.title == 'Not Available':
-            print 'Not available'
-        else:
-            print 'Success'
-        n += 1
+    print anal.extract_c(papers[4])
+#    for p in papers:
+#        print n,
+#        paper = anal.extract_c(p)
+#        if not paper:
+#            print 'Burst'
+#        elif paper.title == 'Not Available':
+#            print 'Not available'
+#        else:
+#            print 'Success'
+#        n += 1
 
     fd.close()
 
 if __name__ == '__main__':
-    #test()
-    main()
+    test()
+    #main()

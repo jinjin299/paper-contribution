@@ -1,4 +1,5 @@
 # coding=utf=8
+import re
 from datetime import datetime
 from paper import paper4
 from bs4 import BeautifulSoup, element
@@ -11,65 +12,38 @@ class analyzer(object):
         soup = BeautifulSoup(data, 'lxml')
         return soup.find_all('div', {'class' : 'search-results-item'})
 
-    def extract_s(self, paper):
-        seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
-        months = ["%02d"% i for i in range(1,13)]
-        cont = paper.find('div', {'class' : 'search-results-content'})
-        div = cont.find('div')
-        title = div.getText(strip=True)
-
-        div = div.nextSibling.nextSibling
-        atxt = div.getText(strip=True).split("By:")[1]
-        if "et al." in atxt:
-            return False
-        authors = [x.strip() for x in atxt.split(";") if x.strip!='']
-
-        div = div.nextSibling.nextSibling
-        d = div.getText(strip=True).split('Published:')[1]
-        ds = d.split(" ")
-        if len(ds) == 1:
-            if "-" in d:
-                date = datetime.strptime(d, "%Y-%m")
-            else:
-               date = datetime.strptime(d, "%Y")
-        elif len(ds) == 2:
-            if "-" in d:
-                d = d.split("-", 1)[0] + u" " + ds[1]
-
-            elif ds[0] in seasons:
-                d = seasons[ds[0]] + u" " + ds[1]
-            ds = d.split(" ")
-            if ds[0] in months:
-                date = datetime.strptime(d, "%m %Y")
-            else:
-                date = datetime.strptime(d, "%b %Y")
-        else:
-            date = datetime.strptime(d, "%b %d %Y")
-        date = date.strftime("%Y.%m.%d")
-
-        cont = paper.find('div', {'class' : 'search-results-data'})
-        ccnt = int(cont.find('a').contents[0].replce(',', ''))
-        return paper4(title, authors, date, ccnt)
-    
     def extract_c(self, paper):
         seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
         months = ["%02d"% i for i in range(1,13)]
         cont = paper.find('span', {'class' : 'reference-title'})
-        if not cont:
-            return paper4('Not Available', [], '', 0)
+        if not cont or "Published:" not in paper.getText():
+            return False
+#            return paper4('Not Available', [], '', 0)
+
         div = cont
         title = div.getText(strip=True)
 
         if div.nextSibling == None:
             div = div.parent
-        div = div.nextSibling.nextSibling
+        pat = re.compile('(?<!Edited )By')
+        while div.nextSibling != None:
+            if type(div) != element.NavigableString \
+                and pat.search(div.getText()):
+                break
+            div = div.nextSibling
         atxt = div.getText(strip=True).split("By:")[1]
+#        print paper.getText()
         if "et al." in atxt:
             return False
         authors = [x.strip() for x in atxt.split(";") if x.strip!='']
-
-        div = div.nextSibling.nextSibling
-        d = div.getText(strip=True).split('Published:')[1]
+        
+        pat = re.compile('Published:')
+        while div.nextSibling != None:
+            if type(div) != element.NavigableString \
+                and pat.search(div.getText()):
+                break
+            div = div.nextSibling
+        d = div.getText(strip=True).split('Published:')[1].replace('.', '')
         ds = d.split(" ")
         if len(ds) == 1:
             if "-" in d:
@@ -130,7 +104,7 @@ class analyzer(object):
                 for p in p_fields:
                     ptxt = p.getText(strip=True)
                     if ptxt.startswith("Published:"):
-                        d = p.find('value').contents[0]
+                        d = p.find('value').contents[0].replace('.', '')
                         ds = d.split(" ")
                         if len(ds) == 1:
                             if "-" in d:
