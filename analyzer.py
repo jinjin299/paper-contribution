@@ -1,5 +1,5 @@
 # coding=utf=8
-import re
+mport re
 from datetime import datetime
 from paper import paper4
 from bs4 import BeautifulSoup, element
@@ -60,6 +60,8 @@ class analyzer(object):
             ds = d.split(" ")
             if ds[0] in months:
                 date = datetime.strptime(d, "%m %Y")
+            elif len(ds[0])>3:
+                date = datetime.strptime(d, "%B %Y")
             else:
                 date = datetime.strptime(d, "%b %Y")
 
@@ -122,6 +124,8 @@ class analyzer(object):
                             ds = d.split(" ")
                             if ds[0] in months:
                                 date = datetime.strptime(d, "%m %Y")
+                            elif len(ds[0])>3:
+                                date = datetime.strptime(d, "%B %Y")
                             else:
                                 date = datetime.strptime(d, "%b %Y")
 
