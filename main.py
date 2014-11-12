@@ -4,18 +4,28 @@ from analyzer import analyzer
 from paper import paper4
 from crawl import wos_bot
 
-def project(bot, anal):
+def project(line):
     """
-    Crawl given paper of bot, cited papers, and
+    With given line containing nobel, title,  and year,
+    crawl given paper of bot, cited papers, and
     reference papers of cited papers.
     If the data is unavailable because of the license,
     the program will return False.
     """
-
+    bot = wos_bot()
+    anal = analyzer()
     pset = set()
+    eset = set()
+    lst = line.strip().split("\t")
+    nobel = lst[0]
+    title, year = lst[1].split("  ")
+    
+    longging.info('START : %s', nobel)
+    bot.search(title, year)
+
     papers = anal.list_papers(bot.data)
     if len(papers) != 1:
-        logging.info('Search Error')
+        logging.error('ROOT SEARCH : %s (%s)', title, nobel)
         return False
 
     bot.link(papers[0])
@@ -74,6 +84,8 @@ def project(bot, anal):
             logging.info('Crawling finished with %s', droot.title)
             break
 
+    pfd = open(nobel + ".papers", 'w')
+    efd = open(nobel + ".edge", 'w')
 
 
 def main():
@@ -84,20 +96,13 @@ def main():
     logging.basicConfig(
         filename='log', level=logging.DEBUG,
         format='%(asctime)s:%(name)s:%(levelname)s\t%(message)s')
-    bot = wos_bot()
-    anal = analyzer()
     fd = open("list",'r')
     logging.info('Open list file')
 
     for line in fd.readlines():
         if line.startswith("#"):
             continue
-        lst = line.strip().split("\t")
-        nobel = lst[0]
-        title, year = lst[1].split("  ")
-        logging.info('Start searching %s', nobel)
-        bot.search(title, year)
-        project(bot, anal)
+        project(line)
 
     fd.close()
 
@@ -106,20 +111,19 @@ def test():
     fd = open("pages/141111_19:30:10.html", 'r')
     papers = anal.list_papers(fd.read())
     n = 1
-    print anal.extract_c(papers[4])
-#    for p in papers:
-#        print n,
-#        paper = anal.extract_c(p)
+    for p in papers:
+        print n,
+        paper = anal.extract_c(p)
 #        if not paper:
 #            print 'Burst'
 #        elif paper.title == 'Not Available':
 #            print 'Not available'
 #        else:
 #            print 'Success'
-#        n += 1
+        n += 1
 
     fd.close()
 
 if __name__ == '__main__':
-    test()
-    #main()
+    #test()
+    main()

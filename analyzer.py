@@ -16,9 +16,10 @@ class analyzer(object):
         seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
         months = ["%02d"% i for i in range(1,13)]
         cont = paper.find('span', {'class' : 'reference-title'})
-        if not cont or "Published:" not in paper.getText():
+        if not cont:
+            return paper4('Not Available', [], '', 0)
+        elif "Published:" not in paper.getText():
             return False
-#            return paper4('Not Available', [], '', 0)
 
         div = cont
         title = div.getText(strip=True)
@@ -32,7 +33,6 @@ class analyzer(object):
                 break
             div = div.nextSibling
         atxt = div.getText(strip=True).split("By:")[1]
-#        print paper.getText()
         if "et al." in atxt:
             return False
         authors = [x.strip() for x in atxt.split(";") if x.strip!='']
