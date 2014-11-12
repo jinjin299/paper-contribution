@@ -1,9 +1,11 @@
 # coding=utf=8
-mport re
+import re
+import string
 from datetime import datetime
 from paper import paper4
 from bs4 import BeautifulSoup, element
 
+# ValueError: time data '27 Sept 2007' does not match format '%b %d %Y'
 class analyzer(object):
     def __init__(self):
         pass
@@ -12,9 +14,45 @@ class analyzer(object):
         soup = BeautifulSoup(data, 'lxml')
         return soup.find_all('div', {'class' : 'search-results-item'})
 
-    def extract_c(self, paper):
+    def stod(self, dstr):
+        """
+        From Given string of date, analyze the string
+        """
         seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
         months = ["%02d"% i for i in range(1,13)]
+
+        d = dstr
+        ds = d.split(" ")
+        if len(ds) == 1:
+            if "-" in d:
+                date = datetime.strptime(d, "%Y-%m")
+            else:
+               date = datetime.strptime(d, "%Y")
+        elif len(ds) == 2:
+            if "-" in d:
+                d = d.split("-", 1)[0] + u" " + ds[1]
+
+            elif ds[0] in seasons:
+                d = seasons[ds[0]] + u" " + ds[1]
+
+            ds = d.split(" ")
+            if ds[0] in months:
+                date = datetime.strptime(d, "%m %Y")
+            else:
+                ds[0] = ds[0][:3]
+                d = " ".join(ds)
+                date = datetime.strptime(d, "%b %Y")
+            
+        else:
+            if any(x in ds[1] for x in string.lowercase):
+                ds[1] = ds[1][:3]
+                d = " ".join(ds)
+                date = datetime.strptime(d, "%d %b %Y")
+            else:
+                date = datetime.strptime(d, "%b %d %Y")
+        date.strftime("%Y.%m.%d")
+
+    def extract_c(self, paper):
         cont = paper.find('span', {'class' : 'reference-title'})
         if not cont:
             return paper4('Not Available', [], '', 0)
@@ -44,30 +82,7 @@ class analyzer(object):
                 break
             div = div.nextSibling
         d = div.getText(strip=True).split('Published:')[1].replace('.', '')
-        ds = d.split(" ")
-        if len(ds) == 1:
-            if "-" in d:
-                date = datetime.strptime(d, "%Y-%m")
-            else:
-               date = datetime.strptime(d, "%Y")
-        elif len(ds) == 2:
-            if "-" in d:
-                d = d.split("-", 1)[0] + u" " + ds[1]
-
-            elif ds[0] in seasons:
-                d = seasons[ds[0]] + u" " + ds[1]
-
-            ds = d.split(" ")
-            if ds[0] in months:
-                date = datetime.strptime(d, "%m %Y")
-            elif len(ds[0])>3:
-                date = datetime.strptime(d, "%B %Y")
-            else:
-                date = datetime.strptime(d, "%b %Y")
-
-        else:
-            date = datetime.strptime(d, "%b %d %Y")
-        date = date.strftime("%Y.%m.%d")
+        date = self.stod(d)
 
         cont = paper.find('div', {'class' : 'search-results-data'})
         ccnt = int(cont.find('a').contents[0].replace(',', ''))
@@ -77,8 +92,6 @@ class analyzer(object):
 
     def extract(self, data):
         authors = []
-        seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
-        months = ["%02d"% i for i in range(1,13)]
         soup = BeautifulSoup(data, 'lxml')
         ccnt = soup.find('span', {'class' : 'TCcountFR'}).getText(strip=True)
         ccnt = int(ccnt.replace(',', ''))
@@ -107,32 +120,7 @@ class analyzer(object):
                     ptxt = p.getText(strip=True)
                     if ptxt.startswith("Published:"):
                         d = p.find('value').contents[0].replace('.', '')
-                        ds = d.split(" ")
-                        if len(ds) == 1:
-                            if "-" in d:
-                                date = datetime.strptime(d, "%Y-%m")
-                            else:
-                               date = datetime.strptime(d, "%Y")
-
-                        elif len(ds) == 2:
-                            if "-" in d:
-                                d = d.split("-", 1)[0] + u" " + ds[1]
-
-                            elif ds[0] in seasons:
-                                d = seasons[ds[0]] + u" " + ds[1]
-
-                            ds = d.split(" ")
-                            if ds[0] in months:
-                                date = datetime.strptime(d, "%m %Y")
-                            elif len(ds[0])>3:
-                                date = datetime.strptime(d, "%B %Y")
-                            else:
-                                date = datetime.strptime(d, "%b %Y")
-
-                        else:
-                            date = datetime.strptime(d, "%b %d %Y")
-                        date = date.strftime("%Y.%m.%d")
+                        date = self.stod(d)
                         break
-
         
         return paper4(title, authors, date, ccnt)

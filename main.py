@@ -11,8 +11,7 @@ def Add_paper(paper, pset):
         for pi in pset:
             if paper.weakeq(pi):
                 logging.debug("WEAK EQUAL : %s", paper.title)
-        pset.add(anal.extract(bot.data))
-
+        pset.add(paper)
     
 def project(line):
     """
@@ -28,9 +27,9 @@ def project(line):
     eset = set()
     lst = line.strip().split("\t")
     nobel = lst[0]
-    title, year = lst[1].split("  ")
+    title, year = lst[1].split("  ")[:2]
     
-    longging.info('START : %s', nobel)
+    logging.info('START : %s', nobel)
     bot.search(title, year)
 
     papers = anal.list_papers(bot.data)
@@ -41,6 +40,7 @@ def project(line):
     bot.link(papers[0])
     bot.save()
     droot = anal.extract(bot.data)
+    Add_paper(droot, pset)
 
     logging.debug("LEVEL 0 : %s", droot.title)
     if not bot.follow_cited():
@@ -53,7 +53,7 @@ def project(line):
     nc = 0
     while True:
         nc += 1
-        logging.debug("LEVEL 1 : %s \%", "%.2f" % nc/float(droot.ccnt)*100)
+        logging.debug("LEVEL 1 : %s / %s", str(nc), str(droot.ccnt))
         bot.save()
         url = bot.url
         paper = anal.extract(bot.data)
@@ -65,7 +65,7 @@ def project(line):
             n = 0
             while True:
                 bot.save()
-                logging.debug("LEVEL 3 : # %s", str(n))
+                logging.debug("LEVEL 2 : # %s", str(n))
                 papers = anal.list_papers(bot.data)
                 for p in papers:
                     n += 1
@@ -76,7 +76,7 @@ def project(line):
                         continue
 
                     if not bot.link(p):
-                        logging.error('ACEESS : %s', str(n))
+                        logging.error('ACCESS ERROR : %s', str(n))
                         return False
                     paper = anal.extract(bot.data)
                     Add_paper(paper, pset)
@@ -102,8 +102,9 @@ def main():
     logging.basicConfig(
         filename='log', level=logging.DEBUG,
         format='%(asctime)s:%(name)s:%(levelname)s\t%(message)s')
+    logging.info("#"*30 + "PROGRAM START" + "#"*30)
     fd = open("list",'r')
-    logging.info('Open list file')
+    logging.info("READ LIST")
 
     for line in fd.readlines():
         if line.startswith("#"):

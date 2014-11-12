@@ -1,18 +1,18 @@
 #Phys1995	Evidence for Anomalous Lepton Production in e+−e− Annihilation  1975
 #Phys1997	Observation of Atoms Laser Cooled below the Doppler Limit  1988
 #Phys1997	Laser Cooling below the One-Photon Recoil Energy by Velocity-Selective Coherent Population Trapping  1988
-#Phys1998	Two-Dimensional Magnetotransport in the Extreme Quantum Limit  1982                                                 Critical Error 141112_10:09:38.html 4
+#Phys1998	Two-Dimensional Magnetotransport in the Extreme Quantum Limit  1982                                                 Critical Error 141112_10:09:38.html 4   arXiv with no link, No Published with no link
 #Phys2001	Observation of Bose-Einstein Condensation in a Dilute Atomic Vapor  1995
-#Phys2001	Bose-Einstein Condensation in a Gas of Sodium Atoms  1995                                                           Critical Error 141112_10:34:39.html 28
+#Phys2001	Bose-Einstein Condensation in a Gas of Sodium Atoms  1995                                                           Critical Error 141112_10:34:39.html 28  ACCESS BUT YEAR > 1970  DATE PARSING 2014-Mar (Epub 2013 Dec 08)
 #Phys2002	Observation of a neutrino burst from the supernova SN1987A  1987
 #Phys2005	Phase Coherent Vacuum-Ultraviolet to Radio Frequency Comparison with a Mode-Locked Laser  2000
-Phys2005	Direct Link between Microwave and Optical Frequencies with a 300 THz Femtosecond Laser Comb  2000
-Phys2006	A preliminary measurement of the cosmic microwave background spectrum by the Cosmic Background Explorer (COBE) satellite  1990
-Phys2006	COBE Differential Microwave Radiometers: Instrument Design and Implementation  1990
-Phys2007	Giant Magnetoresistance of (001)Fe/(001)Cr Magnetic Superlattices  1988
-Phys2007	Layered Magnetic Structures: Evidence for Antiferromagnetic Coupling of Fe Layers across Cr Interlayers  1986
-Phys2010	Electric Field Effect in Atomically Thin Carbon Films  2004
-Phys2011	Observational Evidence from Supernovae for an Accelerating Universe and a Cosmological Constant  1998
-Phys2012	Observing the Progressive Decoherence of the “Meter” in a Quantum Measurement  1996
-Phys2012	Generation of Nonclassical Motional States of a Trapped Atom  1996
-Phys2012	Measurements of Omega and Lambda from 42 High-Redshift Supernovae  1999
+#Phys2005	Direct Link between Microwave and Optical Frequencies with a 300 THz Femtosecond Laser Comb  2000
+#Phys2006	A preliminary measurement of the cosmic microwave background spectrum by the Cosmic Background Explorer (COBE) satellite  1990      Critical Error 141112_10:47:26.html 1  arXiv with no link
+#Phys2006	COBE Differential Microwave Radiometers: Instrument Design and Implementation  1990
+#Phys2007	Giant Magnetoresistance of (001)Fe/(001)Cr Magnetic Superlattices  1988
+#Phys2007	Layered Magnetic Structures: Evidence for Antiferromagnetic Coupling of Fe Layers across Cr Interlayers  1986       Critical Error  /141112_11:27:02.html 4
+#Phys2010	Electric Field Effect in Atomically Thin Carbon Films  2004                                                         Critical Error /141112_11:30:07.html    ACCESS BUT YEAR > 1970
+#Phys2011	Observational Evidence from Supernovae for an Accelerating Universe and a Cosmological Constant  1998               Critical ERror 141112_13:39:44.html ACCESS BUT YEAR > 1970
+#Phys2012	Observing the Progressive Decoherence of the “Meter” in a Quantum Measurement  1996
+#Phys2012	Generation of Nonclassical Motional States of a Trapped Atom  1996
+#Phys2012	Measurements of Omega and Lambda from 42 High-Redshift Supernovae  1999                                             Critical Error  141112_13:56:59.html ACCESS BUT YEAR > 1970
