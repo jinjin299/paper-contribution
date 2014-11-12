@@ -4,6 +4,16 @@ from analyzer import analyzer
 from paper import paper4
 from crawl import wos_bot
 
+def Add_paper(paper, pset):
+    if paper in pset:
+        logging.debug("STRONG EQUAL : %s", paper.title)
+    else:
+        for pi in pset:
+            if paper.weakeq(pi):
+                logging.debug("WEAK EQUAL : %s", paper.title)
+        pset.add(anal.extract(bot.data))
+
+    
 def project(line):
     """
     With given line containing nobel, title,  and year,
@@ -25,56 +35,53 @@ def project(line):
 
     papers = anal.list_papers(bot.data)
     if len(papers) != 1:
-        logging.error('ROOT SEARCH : %s (%s)', title, nobel)
+        logging.error('INVALID SEARCH INPUT: %s (%s)', title, nobel)
         return False
 
     bot.link(papers[0])
-    droot = anal.extract(bot.data)
     bot.save()
-    logging.debug("LEVEL 1 : %s", droot.title)
+    droot = anal.extract(bot.data)
+
+    logging.debug("LEVEL 0 : %s", droot.title)
     if not bot.follow_cited():
-        logging.info('No citation : %s', droot.title)
+        logging.error("NOT CITED : %s (%s)", title, nobel)
         return False
     
-    # Cited papers of original paper
+    bot.save()
     papers = anal.list_papers(bot.data)
     bot.link(papers[0])
+    nc = 0
     while True:
+        nc += 1
+        logging.debug("LEVEL 1 : %s \%", "%.2f" % nc/float(droot.ccnt)*100)
         bot.save()
-        logging.debug("LEVEL 2")
         url = bot.url
         paper = anal.extract(bot.data)
-        if paper in pset:
-            logging.debug("Aleardy Exist : %s", paper.title)
-        else:
-            # Weak equality test
-            for pi in pset:
-                if paper.weakeq(pi):
-                    logging.debug("Weak Equality : %s", paper.title)
-            pset.add(anal.extract(bot.data))
+        Add_paper(paper, pset)
 
         if not bot.follow_ref():
-            logging.info('No Reference : %s', paper.title)
+            logging.debug('NOT REF : %s', paper.title)
         else: 
+            n = 0
             while True:
                 bot.save()
-                logging.debug("LEVEL 3")
+                logging.debug("LEVEL 3 : # %s", str(n))
                 papers = anal.list_papers(bot.data)
-                n = 1
                 for p in papers:
+                    n += 1
+                    logging.debug('EXTRACT : # %s', str(n))
                     paper = anal.extract_c(p)
                     if paper:
-                        n += 1
+                        Add_paper(paper, pset)
                         continue
-                        # We can extract data with short section
-                    logging.debug('Check Link : %s', str(n))
+
                     if not bot.link(p):
-                        logging.debug('Access Error : %s', str(n))
+                        logging.error('ACEESS : %s', str(n))
                         return False
                     paper = anal.extract(bot.data)
+                    Add_paper(paper, pset)
                     bot.back()
                     # manipulate paper
-                    n += 1
                 else:
                     if not bot.next():
                         break
@@ -83,9 +90,8 @@ def project(line):
         if not bot.next():
             logging.info('Crawling finished with %s', droot.title)
             break
-
-    pfd = open(nobel + ".papers", 'w')
-    efd = open(nobel + ".edge", 'w')
+    #pfd = open(nobel + ".papers", 'w')
+    #efd = open(nobel + ".edge", 'w')
 
 
 def main():
