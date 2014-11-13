@@ -19,6 +19,9 @@ def Add_paper(paper, pset):
             fd.close()
             logging.debug("WEAK EQUAL : %s", paper.title)
     pset.add(paper)
+
+def Add_edge(p1, p2, eset):
+    eset.add(p1.title + "\t" + p2.title)
     
 def project(line):
     """
@@ -30,8 +33,7 @@ def project(line):
     """
     bot = wos_bot()
     anal = analyzer()
-    pset = set()
-    eset = set()
+    pset, eset = set(), set()
     nobel, title, year = line.strip().split("\t")
     
     logging.info('START : %s', nobel)
@@ -61,16 +63,48 @@ def project(line):
         logging.debug("LEVEL 1 : %s / %s", str(nc), str(droot.ccnt))
         bot.save()
         url = bot.url
-        paper = anal.extract(bot.data)
-        Add_paper(paper, pset)
+        paper1 = anal.extract(bot.data)
+        Add_paper(paper1, pset)
+        Add_edge(droot, paper1, eset)
 
         if not bot.follow_ref():
-            logging.debug('NOT REF : %s', paper.title)
+            logging.debug('NOT REF : %s', paper1.title)
         else: 
             n = 0
             while True:
                 bot.save()
-                logging.debug("LEVEL 2 : # %s", str(n))
+                logging.debug("LEVEL 2-1 : # %s", str(n))
+                papers = anal.list_papers(bot.data)
+                for p in papers:
+                    n += 1
+                    logging.debug('EXTRACT : # %s', str(n))
+                    paper = anal.extract_c(p)
+                    if paper:
+                        Add_paper(paper, pset)
+                        Add_edge(paper1, paper, eset)
+                        continue
+
+                    if not bot.link(p):
+                        if "[not available]" not in p.getText(strip=True):
+                            logging.error('ACCESS ERROR : %s', str(n))
+                        continue
+                    paper = anal.extract(bot.data)
+                    Add_paper(paper, pset)
+                    Add_edge(paper, paper1, eset)
+                    bot.back()
+                    # manipulate paper
+                else:
+                    if not bot.next():
+                        break
+            bot.go_url(url)
+
+        if not bot.follow_cited():
+            logging.debug('NOT CITED : %s', paper1.title)
+        else: 
+            n = 0
+            while True:
+                bot.save()
+                logging.debug("LEVEL 2-2 : # %s", str(n))
                 papers = anal.list_papers(bot.data)
                 for p in papers:
                     n += 1
@@ -86,6 +120,7 @@ def project(line):
                         continue
                     paper = anal.extract(bot.data)
                     Add_paper(paper, pset)
+                    Add_edge(paper1, paper, eset)
                     bot.back()
                     # manipulate paper
                 else:
@@ -94,10 +129,15 @@ def project(line):
             bot.go_url(url)
 
         if not bot.next():
-            logging.info('Crawling finished with %s', droot.title)
+            logging.info('FINISHED %s (%s)', droot.title, nobel)
+            logging.info("#"*50)
             break
-    #pfd = open(nobel + ".papers", 'w')
-    #efd = open(nobel + ".edge", 'w')
+    for pi in pset:
+        pfd = open("data/" + nobel + ".papers", 'w')
+    pfd.close()
+    for ei in eset:
+        efd = open("data/" + nobel + ".edges", 'w')
+    efd.close()
 
 
 def main():
@@ -121,7 +161,7 @@ def main():
 
 def test():
     anal = analyzer()
-    fd = open("pages/141111_19:30:10.html", 'r')
+    fd = open("pages/141114_00:52:08.html", 'r')
     papers = anal.list_papers(fd.read())
     n = 1
     for p in papers:

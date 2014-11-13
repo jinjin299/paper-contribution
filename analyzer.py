@@ -62,7 +62,8 @@ class analyzer(object):
         div = cont
         title = div.getText(strip=True)
 
-        if div.nextSibling == None:
+        if (div.nextSibling == None
+                or div.nextSibling.nextSibling == None):
             div = div.parent
         
         if pat.search(paper.getText()):
