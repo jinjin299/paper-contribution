@@ -53,6 +53,7 @@ class analyzer(object):
 
     def extract_c(self, paper):
         cont = paper.find('span', {'class' : 'reference-title'})
+        pat = re.compile('(?<!Edited )By')
         if not cont:
             return False
         elif "Published:" not in paper.getText():
@@ -63,17 +64,20 @@ class analyzer(object):
 
         if div.nextSibling == None:
             div = div.parent
-        pat = re.compile('(?<!Edited )By')
-        while div.nextSibling != None:
-            if (type(div) != element.NavigableString
-                    and pat.search9div.getText()):
-                break
-            div = div.nextSibling
-        atxt = div.getText(strip=True).split("By:")[1]
-        if "et al." in atxt:
-            return False
-        authors = [x.strip() for x in atxt.split(";") if x.strip!='']
         
+        if pat.search(paper.getText()):
+            while div.nextSibling != None:
+                if (type(div) != element.NavigableString
+                        and pat.search(div.getText())):
+                    break
+                div = div.nextSibling
+            atxt = div.getText(strip=True).split("By:")[1]
+            if "et al." in atxt:
+                return False
+            authors = [x.strip() for x in atxt.split(";") if x.strip!='']
+        else:
+            authors = []
+
         pat = re.compile('Published:')
         while div.nextSibling != None:
             if type(div) != element.NavigableString \
