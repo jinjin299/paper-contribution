@@ -1,17 +1,24 @@
-#!/usr/bin/env python
 import logging
 from analyzer import analyzer
 from paper import paper4
 from crawl import wos_bot
 
 def Add_paper(paper, pset):
-    if paper in pset:
-        logging.debug("STRONG EQUAL : %s", paper.title)
-    else:
-        for pi in pset:
-            if paper.weakeq(pi):
-                logging.debug("WEAK EQUAL : %s", paper.title)
-        pset.add(paper)
+    for pi in pset:
+        if paper == pi:
+            logging.debug("STRONG EQUAL : %s", paper.title)
+            return False
+        elif paper.__eq__(pi):
+            logging.debug("SSTRONG EQUAL : %s", paper.title)
+            return False
+        elif paper.weakeq(pi):
+            fd = open("weak", 'a')
+            fd.write(str(pi))
+            fd.write(str(paper))
+            fd.write("="*50)
+            fd.close()
+            logging.debug("WEAK EQUAL : %s", paper.title)
+    pset.add(paper)
     
 def project(line):
     """
@@ -25,9 +32,7 @@ def project(line):
     anal = analyzer()
     pset = set()
     eset = set()
-    lst = line.strip().split("\t")
-    nobel = lst[0]
-    title, year = lst[1].split("  ")[:2]
+    nobel, title, year = line.strip().split("\t")
     
     logging.info('START : %s', nobel)
     bot.search(title, year)
@@ -76,8 +81,9 @@ def project(line):
                         continue
 
                     if not bot.link(p):
-                        logging.error('ACCESS ERROR : %s', str(n))
-                        return False
+                        if "[not available]" not in p.getText(strip=True):
+                            logging.error('ACCESS ERROR : %s', str(n))
+                        continue
                     paper = anal.extract(bot.data)
                     Add_paper(paper, pset)
                     bot.back()

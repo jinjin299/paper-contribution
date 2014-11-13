@@ -5,7 +5,6 @@ from datetime import datetime
 from paper import paper4
 from bs4 import BeautifulSoup, element
 
-# ValueError: time data '27 Sept 2007' does not match format '%b %d %Y'
 class analyzer(object):
     def __init__(self):
         pass
@@ -55,7 +54,7 @@ class analyzer(object):
     def extract_c(self, paper):
         cont = paper.find('span', {'class' : 'reference-title'})
         if not cont:
-            return paper4('Not Available', [], '', 0)
+            return False
         elif "Published:" not in paper.getText():
             return False
 
@@ -66,8 +65,8 @@ class analyzer(object):
             div = div.parent
         pat = re.compile('(?<!Edited )By')
         while div.nextSibling != None:
-            if type(div) != element.NavigableString \
-                and pat.search(div.getText()):
+            if (type(div) != element.NavigableString
+                    and pat.search9div.getText()):
                 break
             div = div.nextSibling
         atxt = div.getText(strip=True).split("By:")[1]

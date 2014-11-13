@@ -17,10 +17,11 @@ class paper4(object):
         return tmp % (self.title, auth, self.pdate, self.ccnt)
     
     def weakeq(self, paper):
-        return self.title == paper.title
+        return (isinstance(paper, self.__class__) and self.title == paper.title)
 
     def __eq__(self, paper):
-        f1 = self.title == paper.title
-        f2 = self.authors == paper.authors
-        f3 = self.pdate == paper.pdate
-        return f1 and f2 and f3
+        a = dict(self.__dict__)
+        b = dict(paper.__dict__)
+        del a['ccnt']
+        del b['ccnt']
+        return (isinstance(paper, self.__class__) and a == b)
