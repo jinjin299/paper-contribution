@@ -22,6 +22,10 @@ def Add_paper(paper, pset):
 
 def Add_edge(p1, p2, eset):
     eset.add(p1.title + "\t" + p2.title)
+
+#def Cite_or_ref(bot, anal, sign, lv, pset, eset):
+#    url = 
+
     
 def project(line):
     """
@@ -50,17 +54,56 @@ def project(line):
     Add_paper(droot, pset)
 
     logging.debug("LEVEL 0 : %s", droot.title)
+    url = bot.url
+    if not bot.follow_ref():
+        logging.debug('NOT REF : %s (%s)', title, nobel)
+    else:
+        n = 0
+        while True:
+            papers = anal.list_papers(bot.data)
+            if len(papers) == 0:
+                logging.debug("NOT REF 2 : %s", paper1.title)
+                break
+            bot.save()
+            logging.debug("LEVEL 1-R : # %s", str(n))
+            for p in papers:
+                n += 1
+                logging.debug('EXTRACT : # %s', str(n))
+                paper = anal.extract_c(p)
+                if paper:
+                    Add_paper(paper, pset)
+                    Add_edge(paper, droot, eset)
+                    continue
+
+                if not bot.link(p):
+                    if "[not available]" not in p.getText(strip=True):
+                        logging.error('ACCESS ERROR : %s', str(n))
+                    continue
+                bot.save()
+                paper = anal.extract(bot.data)
+                Add_paper(paper, pset)
+                Add_edge(paper, droot, eset)
+                bot.back()
+            else:
+                if not bot.next():
+                    break
+        bot.go_url(url)
+
+
     if not bot.follow_cited():
         logging.error("NOT CITED : %s (%s)", title, nobel)
         return False
     
-    bot.save()
     papers = anal.list_papers(bot.data)
+    if len(papers) == 0:
+        logging.error("NOT CITED 2 : %s (%s)", title, nobel)
+        return False
+    bot.save()
     bot.link(papers[0])
     nc = 0
     while True:
         nc += 1
-        logging.debug("LEVEL 1 : %s / %s", str(nc), str(droot.ccnt))
+        logging.debug("LEVEL 1-C : %s / %s", str(nc), str(droot.ccnt))
         bot.save()
         url = bot.url
         paper1 = anal.extract(bot.data)
@@ -72,9 +115,12 @@ def project(line):
         else: 
             n = 0
             while True:
-                bot.save()
-                logging.debug("LEVEL 2-1 : # %s", str(n))
                 papers = anal.list_papers(bot.data)
+                if len(papers) == 0:
+                    logging.debug("NOT REF 2 : %s", paper1.title)
+                    break
+                bot.save()
+                logging.debug("LEVEL 2-R : # %s", str(n))
                 for p in papers:
                     n += 1
                     logging.debug('EXTRACT : # %s', str(n))
@@ -102,9 +148,12 @@ def project(line):
         else: 
             n = 0
             while True:
-                bot.save()
-                logging.debug("LEVEL 2-2 : # %s", str(n))
                 papers = anal.list_papers(bot.data)
+                if len(papers) == 0:
+                    logging.debug("NOT CITED 2 : %s", paper1.title)
+                    break
+                bot.save()
+                logging.debug("LEVEL 2-C : # %s", str(n))
                 for p in papers:
                     n += 1
                     logging.debug('EXTRACT : # %s', str(n))
@@ -159,7 +208,7 @@ def main():
 
 def test():
     anal = analyzer()
-    fd = open("pages/141114_00:52:08.html", 'r')
+    fd = open("pages/141114_11:35:17.html", 'r')
     papers = anal.list_papers(fd.read())
     n = 1
     for p in papers:
