@@ -49,7 +49,13 @@ class analyzer(object):
                 date = datetime.strptime(d, "%d %b %Y")
             else:
                 date = datetime.strptime(d, "%b %d %Y")
-        date.strftime("%Y.%m.%d")
+        if date.year < 1900:
+            year = date.year
+            mon = date.month
+            day = date.day
+            return "%d.%02d.%02d" % (year, mon, day)
+
+        return date.strftime("%Y.%m.%d")
 
     def extract_c(self, paper):
         cont = paper.find('span', {'class' : 'reference-title'})

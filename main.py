@@ -92,7 +92,6 @@ def project(line):
                     Add_paper(paper, pset)
                     Add_edge(paper, paper1, eset)
                     bot.back()
-                    # manipulate paper
                 else:
                     if not bot.next():
                         break
@@ -122,7 +121,6 @@ def project(line):
                     Add_paper(paper, pset)
                     Add_edge(paper1, paper, eset)
                     bot.back()
-                    # manipulate paper
                 else:
                     if not bot.next():
                         break
@@ -167,12 +165,6 @@ def test():
     for p in papers:
         print n,
         paper = anal.extract_c(p)
-#        if not paper:
-#            print 'Burst'
-#        elif paper.title == 'Not Available':
-#            print 'Not available'
-#        else:
-#            print 'Success'
         n += 1
 
     fd.close()
