@@ -17,7 +17,7 @@ class analyzer(object):
         """
         From Given string of date, analyze the string
         """
-        seasons = {'SPR':'MAR','SUM':'JUN','FAL':'SEP','WIN':'DEC'}
+        seasons = {'SPR':'MAR', 'SUM':'JUN', 'FAL':'SEP', 'WIN':'DEC'}
         months = ["%02d"% i for i in range(1,13)]
 
         d = dstr

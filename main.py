@@ -23,9 +23,51 @@ def Add_paper(paper, pset):
 def Add_edge(p1, p2, eset):
     eset.add(p1.title + "\t" + p2.title)
 
-#def Cite_or_ref(bot, anal, sign, lv, pset, eset):
-#    url = 
+def Cite_or_ref(bot, anal, origin, sign, lv, pset, eset):
+    sdict = {"R" : 'follow_ref', "C" : 'follow_cited'}
+    lv = str(lv)
+    fs = sdict[sign]
+    url = bot.url
+    if not getattr(wos_bot, fs)(bot):
+        logging.debug("NOT %s : %s", sign, origin.title)
+        return False
+    else:
+        n = 0
+        while True:
+            papers = anal.list_papers(bot.data)
+            if len(papers) == 0:
+                logging.debug("NOT %s 2 : %s", sign, origin.title)
+                break
+            bot.save()
+            logging.debug("LEVEL %s-%s : # %s", lv, sign, str(n))
+            for p in papers:
+                n += 1
+                logging.debug('EXTRACT : # %s', str(n))
+                paper = anal.extract_c(p)
+                if paper:
+                    Add_paper(paper, pset)
+                    if sign == "R":
+                        Add_edge(paper, origin, eset)
+                    else:
+                        Add_edge(origin, paper, eset)
+                    continue
 
+                if not bot.link(p):
+                    if "[not available]" not in p.getText(strip=True):
+                        logging.error('ACCESS ERROR : %s', str(n))
+                    continue
+                bot.save()
+                paper = anal.extract(bot.data)
+                Add_paper(paper, pset)
+                if sign == "R":
+                    Add_edge(paper, origin, eset)
+                else:
+                    Add_edge(origin, paper, eset)
+                bot.back()
+            else:
+                if not bot.next():
+                    break
+        bot.go_url(url)
     
 def project(line):
     """
@@ -52,43 +94,9 @@ def project(line):
     bot.save()
     droot = anal.extract(bot.data)
     Add_paper(droot, pset)
-
     logging.debug("LEVEL 0 : %s", droot.title)
-    url = bot.url
-    if not bot.follow_ref():
-        logging.debug('NOT REF : %s (%s)', title, nobel)
-    else:
-        n = 0
-        while True:
-            papers = anal.list_papers(bot.data)
-            if len(papers) == 0:
-                logging.debug("NOT REF 2 : %s", paper1.title)
-                break
-            bot.save()
-            logging.debug("LEVEL 1-R : # %s", str(n))
-            for p in papers:
-                n += 1
-                logging.debug('EXTRACT : # %s', str(n))
-                paper = anal.extract_c(p)
-                if paper:
-                    Add_paper(paper, pset)
-                    Add_edge(paper, droot, eset)
-                    continue
 
-                if not bot.link(p):
-                    if "[not available]" not in p.getText(strip=True):
-                        logging.error('ACCESS ERROR : %s', str(n))
-                    continue
-                bot.save()
-                paper = anal.extract(bot.data)
-                Add_paper(paper, pset)
-                Add_edge(paper, droot, eset)
-                bot.back()
-            else:
-                if not bot.next():
-                    break
-        bot.go_url(url)
-
+    Cite_or_ref(bot, anal, droot, "R", 1, pset, eset)
 
     if not bot.follow_cited():
         logging.error("NOT CITED : %s (%s)", title, nobel)
@@ -105,85 +113,27 @@ def project(line):
         nc += 1
         logging.debug("LEVEL 1-C : %s / %s", str(nc), str(droot.ccnt))
         bot.save()
-        url = bot.url
         paper1 = anal.extract(bot.data)
         Add_paper(paper1, pset)
         Add_edge(droot, paper1, eset)
-
-        if not bot.follow_ref():
-            logging.debug('NOT REF : %s', paper1.title)
-        else: 
-            n = 0
-            while True:
-                papers = anal.list_papers(bot.data)
-                if len(papers) == 0:
-                    logging.debug("NOT REF 2 : %s", paper1.title)
-                    break
-                bot.save()
-                logging.debug("LEVEL 2-R : # %s", str(n))
-                for p in papers:
-                    n += 1
-                    logging.debug('EXTRACT : # %s', str(n))
-                    paper = anal.extract_c(p)
-                    if paper:
-                        Add_paper(paper, pset)
-                        Add_edge(paper1, paper, eset)
-                        continue
-
-                    if not bot.link(p):
-                        if "[not available]" not in p.getText(strip=True):
-                            logging.error('ACCESS ERROR : %s', str(n))
-                        continue
-                    paper = anal.extract(bot.data)
-                    Add_paper(paper, pset)
-                    Add_edge(paper, paper1, eset)
-                    bot.back()
-                else:
-                    if not bot.next():
-                        break
-            bot.go_url(url)
-
-        if not bot.follow_cited():
-            logging.debug('NOT CITED : %s', paper1.title)
-        else: 
-            n = 0
-            while True:
-                papers = anal.list_papers(bot.data)
-                if len(papers) == 0:
-                    logging.debug("NOT CITED 2 : %s", paper1.title)
-                    break
-                bot.save()
-                logging.debug("LEVEL 2-C : # %s", str(n))
-                for p in papers:
-                    n += 1
-                    logging.debug('EXTRACT : # %s', str(n))
-                    paper = anal.extract_c(p)
-                    if paper:
-                        Add_paper(paper, pset)
-                        continue
-
-                    if not bot.link(p):
-                        if "[not available]" not in p.getText(strip=True):
-                            logging.error('ACCESS ERROR : %s', str(n))
-                        continue
-                    paper = anal.extract(bot.data)
-                    Add_paper(paper, pset)
-                    Add_edge(paper1, paper, eset)
-                    bot.back()
-                else:
-                    if not bot.next():
-                        break
-            bot.go_url(url)
+        
+        Cite_or_ref(bot, anal, paper1, "R", 2, pset, eset)
+        Cite_or_ref(bot, anal, paper1, "C", 2, pset, eset)
+        bot.save()
 
         if not bot.next():
             logging.info('FINISHED %s (%s)', droot.title, nobel)
             logging.info("#"*50)
+            bot.save()
             break
+
+    pfd = open("data/" + nobel + ".papers", 'w')
     for pi in pset:
-        pfd = open("data/" + nobel + ".papers", 'w')
+        pfd.write(str(pi))
     pfd.close()
+    efd = open("data/" + nobel + ".edges", 'w')
     for ei in eset:
-        efd = open("data/" + nobel + ".edges", 'w')
+        efd.write(ei+"\n")
     efd.close()
 
 
