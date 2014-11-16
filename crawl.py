@@ -38,38 +38,28 @@ class wos_bot(object):
                 datal[i+1] = data_str
             self.data = "".join(datal)
 
-    def link(self, paper):
-        link = paper.find('a', {'class' : 'smallV110'})
-        if link:
-            self.br.follow_link(url=link.get('href'))
-            self.nohigh()
-            return True
+    def get_url(self, url_type, paper=None):
+        if (url_type == "paper"):
+            link = paper.find('a', {'class' : 'smallV110'})
+            if link:
+                return self.parse_url(link.get('href'))
         else:
-            return False
+            ttxt = {
+                    "cite" : "View all of the articles that cite this one",
+                    "ref" : "View this record’s bibliography",
+                    "next" : "Next Page"}[url_type]
+            for link in self.br.links():
+                attrs = dict(link.attrs)
+                if ('title' in attrs and attrs['title'] == ttxt):
+                    return self.parse_url(link.url)
+        return False
 
-    
-    def follow_cited(self):
-        for link in self.br.links():
-            attrs = dict(link.attrs)
-            if 'title' in attrs and attrs['title'] == \
-                    "View all of the articles that cite this one":
-                self.br.follow_link(link)
-                self.nohigh()
-                return True
-
+    def parse_url(self, url):
+        if url.startswith("/"):
+            base_url = "http://apps.webofknowledge.com.ocam.korea.ac.kr"
         else:
-            return False
-
-    def follow_ref(self):
-        for link in self.br.links():
-            attrs = dict(link.attrs)
-            if 'title' in attrs and  attrs['title'] == \
-                    "View this record’s bibliography":
-                self.br.follow_link(link)
-                self.nohigh()
-                return True
-        else:
-            return False
+            base_url = ""
+        return base_url + url
 
     def back(self, n=1):
         for i in range(n-1):
@@ -77,16 +67,17 @@ class wos_bot(object):
         self.br.back()
         self.nohigh()
 
-    def next(self):
-        for link in self.br.links():
-            attrs = dict(link.attrs)
-            if 'title' in attrs and attrs['title']=='Next Page':
-                self.br.follow_link(link)
-                self.nohigh()
-                return True
-        return False
 
     def go_url(self, url):
+        self.br.open(url)
+        self.nohigh()
+
+    def go_n(self, n):
+        url = self.url
+        tmp = url.split("doc=")
+        tmp2 = tmp[1].split("&")
+        tmp[1] = "&".join([str(n)] + tmp2[1:])
+        url = "doc=".join(tmp)
         self.br.open(url)
         self.nohigh()
 

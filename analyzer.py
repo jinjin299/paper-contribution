@@ -2,7 +2,7 @@
 import re
 import string
 from datetime import datetime
-from paper import paper4
+from paper import paper4, paper5
 from bs4 import BeautifulSoup, element
 
 class analyzer(object):
@@ -100,7 +100,7 @@ class analyzer(object):
         return paper4(title, authors, date, ccnt)
 
 
-    def extract(self, data):
+    def extract(self, data, tn=4):
         authors = []
         soup = BeautifulSoup(data, 'lxml')
         ccnt = soup.find('span', {'class' : 'TCcountFR'}).getText(strip=True)
@@ -132,5 +132,11 @@ class analyzer(object):
                         d = p.find('value').contents[0].replace('.', '')
                         date = self.stod(d)
                         break
-        
-        return paper4(title, authors, date, ccnt)
+        if tn == 4: 
+            return paper4(title, authors, date, ccnt)
+        elif tn == 5:
+            pat = re.compile("(\d+?) Cited References")
+            rcnt = int(pat.search(data).group(1))
+            return paper5(title, authors, date, rcnt, ccnt)
+
+#"\n(\d+?)\nTITLE\n(.+?)\n\nABSTRACT\n(.*?)\n\nAUTHORS\n(.*?)\n\nGROUPS\n(.*?)\nADDRESSES\n(.*?)\nJOURNAL\n(.+?)PUB_DATE\n(.+?)\n\nKEYWORDS\n(.*?)\nCITED\n(.*?)\nREFERENCE\n(.*?)\n\n\n\n"
