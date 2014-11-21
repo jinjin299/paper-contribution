@@ -1,6 +1,7 @@
 # coding:utf-8
 import mechanize
 import urllib2
+import codecs
 from time import localtime, strftime, sleep
 
 class wos_bot(object):
@@ -30,7 +31,7 @@ class wos_bot(object):
 
     def nohigh(self):
         self.url = self.br.geturl()
-        self.data = self.br.response().get_data()
+        self.data = self.br.response().get_data().decode('utf-8', 'strict')
         if '<span class="hitHilite">' in self.data:
             datal = self.data.split('<span class="hitHilite">')
             for i in range(len(datal) - 1):
@@ -95,8 +96,8 @@ class wos_bot(object):
 
     def save(self):
         tstr = strftime("%y%m%d_%H:%M:%S", localtime())
-        fd = open("pages/" + tstr + ".html", 'w')
-        #fd = codecs.open("pages/" + tstr + ".html", 'w', 'utf-8')
+        #fd = open("pages/" + tstr + ".html", 'w')
+        fd = codecs.open("pages/" + tstr + ".html", 'w', 'utf-8')
         fd.write(self.data)
         fd.close()
 
