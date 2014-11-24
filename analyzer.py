@@ -84,7 +84,8 @@ class analyzer(object):
             atxt = div.getText(strip=True).split("By:")[1]
             if "et al." in atxt:
                 return False
-            authors = [x.strip() for x in atxt.split(";") if x.strip!='']
+            authors = [x.strip() for x in atxt.split(";") 
+                    if x.strip != '' or x.strip != 'et al']
         else:
             authors = []
 
@@ -109,8 +110,8 @@ class analyzer(object):
     def extract(self, data, tn=4):
         authors = []
         soup = BeautifulSoup(data, 'lxml')
-        ccnt = soup.find('span', {'class' : 'TCcountFR'}).getText(strip=True)
-        ccnt = int(ccnt.replace(',', ''))
+        ccnt = soup.find('span', {'class' : 'TCcountFR'})
+        ccnt = int(ccnt.getText(strip=True).replace(',', ''))
         cont = soup.find('div', 'l-content')
         title = cont.find('div', 'title').value.contents[0].strip()
         

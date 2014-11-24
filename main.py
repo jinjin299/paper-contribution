@@ -1,9 +1,10 @@
 import logging
 import re
 import codecs
+import Queue
 from analyzer import analyzer
 from paper import paper4
-from crawl import wos_bot
+from crawl import wos_bot, thread_bot
 from time import sleep
 
 def init():
@@ -11,7 +12,6 @@ def init():
         filename='log', level=logging.DEBUG,
         format='%(asctime)s:%(name)s:%(levelname)s\t%(message)s')
     logging.info("#"*30 + "PROGRAM START" + "#"*30)
-
 
 def Add_paper(paper, pset):
     if paper.pdate == None:
@@ -55,7 +55,8 @@ def write_data(nobel, nc, piset, eiset, mode='a'):
     efd.close()
 
 
-def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset):
+def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset, recur=None):
+    rdict = {"R" : "ref", "C" : "cite"}
     if not url:
         logging.debug("NOT %s : %s", sign, origin.title)
         return False
@@ -88,6 +89,8 @@ def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset):
 
             logging.debug("IN PAGE FAIL : # %s", str(n))
             purl = bot.get_url("paper", p)
+            if "arXiv" in p.getText():
+                logging.warning("arXiv DATA")
             if "[not available]" in p.getText(strip=True):
                 continue
             elif not purl:
@@ -95,13 +98,48 @@ def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset):
                 continue
             ldict[n] = purl
 
-        for ni in ldict:
-            bot.go_url(ldict[ni])
-            bot.save()
+        if not recur:
+            queue = Queue.Queue()
+            out_queue = Queue.Queue()
+            stat_queue = Queue.Queue()
+            tl = []
+            cj = bot.cookiejar()
+            for i in range(len(ldict)):
+                tl.append(thread_bot(queue, out_queue, stat_queue, cj))
+                tl[-1].setDaemon(True)
+                tl[-1].start()
 
-            paper = anal.extract(bot.data)
-            logging.debug("INSDIE LINK EXTRACT : # %s", str(ni))
-            Add_pe(origin, paper, sign, pset, eset)
+            for i in [(x, ldict[x]) for x in ldict]:
+                queue.put(i)
+
+            queue.join()
+            try:
+                exc = stat_queue.get(block=False)
+            except Queue.Empty:
+                pass
+            else:
+                exc_type, exc_obj, exc_trace = exc
+                print exc_type
+                print exc_obj
+                print exc_trace
+                raise Exception("ERROR")
+
+            for i in range(len(ldict)):
+                paper = out_queue.get()
+                Add_pe(origin, paper, sign, pset, eset)
+
+        else:
+            for ni in ldict:
+                bot.go_url(ldict[ni])
+                bot.save()
+                paper = anal.extract(bot.data)
+                logging.debug("INSDIE LINK EXTRACT : # %s", str(ni))
+                Add_pe(origin, paper, sign, pset, eset)
+                if recur:
+                    logging.debug("START RECURSION : # %s", str(ni))
+                    rurl = bot.get_url(rdict[recur])
+                    Cite_or_ref(bot, anal, paper, 0,
+                                recur, rurl, pset, eset)
     
         if not nurl:
             break
@@ -192,6 +230,9 @@ def project(line):
         pset, eset = set(), set()
         bot.save()
         paper1 = anal.extract(bot.data)
+        if not paper1:
+            logging.info("INVALID NEXT")
+            break
 
         Add_pe(droot, paper1, "C", pset, eset)
         
@@ -201,7 +242,8 @@ def project(line):
         nurl = bot.get_url("next")
                 
         # Go to the list 
-        Cite_or_ref(bot, anal, paper1, 1, "R", rurl, pset, eset)
+        Cite_or_ref(bot, anal, paper1, 1,
+                    "R", rurl, pset, eset, recur="R")
         bot.save()
         Cite_or_ref(bot, anal, paper1, 3, "C", curl, pset, eset)
         bot.save()
@@ -209,14 +251,15 @@ def project(line):
 
         # Go to the next paper page
         if not nurl:
-            logging.info('FINISHED %s (%s)', droot.title, nobel)
-            logging.info("#"*50)
+            logging.info("END OF LIST")
             break
         else:
             bot.go_url(nurl)
             # Check Error on next paper page
             # If there is an error we should break 
 
+    logging.info('FINISHED %s (%s)', droot.title, nobel)
+    logging.info("#"*50)
     return True
 
 
@@ -232,6 +275,8 @@ def main():
     for line in open("list", 'r').readlines():
         if line.startswith("#"):
             continue
+        project(line)
+        break
         while True:
             try:
                 if not project(line):
@@ -245,9 +290,13 @@ def main():
                 break
 
 def test():
+    line = "Phys1995_1\tDetection of the Free Neutrino - Confirmation\t1956"
+    bot = wos_bot()
     anal = analyzer()
-    pset, eset, nmax = anal.Check_data("Phys1995_1")
+    nobel, title, year = line.strip().split("\t")
+    bot.search(title, year)
+    for l in bot.br.links():
+        print l.text
 
 if __name__ == '__main__':
     main()
-    test()

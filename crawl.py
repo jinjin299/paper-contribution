@@ -1,12 +1,61 @@
 # coding:utf-8
-import mechanize
 import urllib2
 import codecs
+import threading
+import os
+import sys
+import logging
 from time import localtime, strftime, sleep
+from mechanize import Browser
+from analyzer import analyzer
+
+
+class thread_bot(threading.Thread):
+    def __init__(self, queue, out_queue, stat_queue, cj=None):
+        threading.Thread.__init__(self)
+        self.br = Browser()
+        self.br.set_handle_robots(False)
+        if cj:
+            self.br._ua_handlers['_cookies'].cookiejar = cj
+        self.queue = queue
+        self.out_queue = out_queue
+        self.stat_queue = stat_queue
+
+    def run(self):
+        try:
+            ni, url = self.queue.get()
+            anal = analyzer()
+            self.br.open(url)
+            self.nohigh()
+            self.save()
+            logging.debug("INSDIE LINK EXTRACT : # %s", str(ni))
+            paper = anal.extract(self.data)
+            self.out_queue.put(paper)
+        except:
+            self.stat_queue.put(sys.exc_info())
+        self.queue.task_done()
+
+    def save(self):
+        tstr = strftime("%y%m%d_%H:%M:%S", localtime())
+        if not os.path.exists("pages/%s" % tstr[:6]):
+            os.system("mkdir pages/%s" % tstr[:6])
+        fd = codecs.open("pages/%s/%s.html" % (tstr[:6], tstr), 'w', 'utf-8')
+        fd.write(self.data)
+        fd.close()
+
+    def nohigh(self):
+        self.url = self.br.geturl()
+        self.data = self.br.response().get_data().decode('utf-8', 'strict')
+        if '<span class="hitHilite">' in self.data:
+            datal = self.data.split('<span class="hitHilite">')
+            for i in range(len(datal) - 1):
+                data_str = "".join(datal[i+1].split('</span>',1))
+                datal[i+1] = data_str
+            self.data = "".join(datal)
 
 class wos_bot(object):
     def __init__(self):
-        self.br = mechanize.Browser()
+        self.br = Browser()
         self.br.set_handle_robots(False)
         self.br.open("http://medlib.korea.ac.kr/login")
         self.br.select_form('login')
@@ -82,23 +131,30 @@ class wos_bot(object):
         self.br.open(url)
         self.nohigh()
 
-    def search(self, title, year):
+    def search(self, title, year=None):
         self.br.select_form("WOS_GeneralSearch_input_form")
         padding = ' NOT "(vol 76, pg 1796, 1996)"'
         self.br.form['value(input1)'] = '"' + title + '"' + padding
         self.br['value(select1)'] = ['TI']
-        self.br['period'] = ['Year Range']
-        self.br['startYear'] = [year]
-        self.br['endYear'] = [year]
+        if not year:
+            self.br['period'] = ['Year Range']
+            self.br['startYear'] = [year]
+            self.br['endYear'] = [year]
         self.br.form.fixup()
         self.br.submit()
+        self.nohigh()
+        self.br.open(self.url + "&action=changePageSize&pageSize=50")
         self.nohigh()
 
     def save(self):
         tstr = strftime("%y%m%d_%H:%M:%S", localtime())
-        #fd = open("pages/" + tstr + ".html", 'w')
-        fd = codecs.open("pages/" + tstr + ".html", 'w', 'utf-8')
+        if not os.path.exists("pages/%s" % tstr[:6]):
+            os.system("mkdir pages/%s" % tstr[:6])
+        fd = codecs.open("pages/%s/%s.html" % (tstr[:6], tstr), 'w', 'utf-8')
         fd.write(self.data)
         fd.close()
+
+    def cookiejar(self):
+        return self.br._ua_handlers['_cookies'].cookiejar
 
 # line width 79 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
