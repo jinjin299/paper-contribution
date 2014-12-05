@@ -170,7 +170,7 @@ def project(line):
     anal = analyzer()
     nobel, title, year = line.strip().split("\t")
     logging.info("#" * 50) 
-    logging.info('START : %s\t%s', nobel)
+    logging.info('START : %s', nobel)
     bot.search(title, year)
     logging.info('SEARCH : %s\t%s', title, year)
 

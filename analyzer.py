@@ -126,14 +126,13 @@ class analyzer(object):
         return date
 
     def extract_c(self, paper):
-        cont = paper.find('span', {'class' : 'reference-title'})
-        pat = re.compile('(?<!Edited )By:')
-        if not cont:
-            return False
-        elif "Published:" not in paper.getText():
+        div = paper.find('span', {'class' : 'reference-title'})
+        if (paper.find('a', {'class' : 'smallV110'})
+                or (not div) or ("Published:" not in paper.getText())):
             return False
 
-        div = cont
+        pat = re.compile('(?<!Edited )By:')
+
         title = div.getText(strip=True)
 
         if (div.nextSibling == None
@@ -149,7 +148,7 @@ class analyzer(object):
             atxt = div.getText(strip=True).split("By:")[1]
             if "et al." in atxt:
                 return False
-            authors = [x.strip() for x in atxt.split(";") 
+            authors = [x.strip() for x in atxt.split("; ") 
                     if x.strip != '' or x.strip != 'et al']
         else:
             authors = []
@@ -170,10 +169,7 @@ class analyzer(object):
         cont = paper.find('div', {'class' : 'search-results-data'})
         ccnt = int(cont.find('a').contents[0].replace(',', ''))
 
-        if paper.find('a', {'class' : 'smallV110'}):
-            return paper4(title, authors, date, True, ccnt)
-        else:
-            return paper4(title, authors, date, False, ccnt)
+        return paper4(title, authors, date, False, ccnt)
 
 
     def extract(self, data, tn=4):
@@ -228,7 +224,7 @@ class analyzer(object):
         if (not os.path.isfile(root + ".paper4")
                 or not os.path.isfile(root + ".edges")):
             logging.info("DATA ARE NOT EXIST")
-            return set(), 0, 0, 0
+            return 0, 0, 0, set()
         data = codecs.open(root + ".paper4", 'r', 'utf-8').read()
         edata = codecs.open(root + ".edges", 'r', 'utf-8').read()
         pset, eset, nset = set(), set(), set()

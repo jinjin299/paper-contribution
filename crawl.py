@@ -64,7 +64,7 @@ class wos_bot(object):
         self.br['username'] = ID
         self.br['password'] = PASS
         self.br.submit()
-        for link in self.br_links():
+        for link in self.br.links():
             if link.text == 'continue and establish a new session':
                 self.br.follow_link(link)
                 break
@@ -91,7 +91,7 @@ class wos_bot(object):
         if (url_type == "paper"):
             link = paper.find('a', {'class' : 'smallV110'})
             if (link and
-                    ("record.do?product=WOS" in str(link).split("&", 2)[0].lower())):
+                    ("record.do?product=wos" in str(link).split("&", 2)[0].lower())):
                 return self.parse_url(link.get('href'))
         else:
             ttxt = {"cite" : "View all of the articles that cite this one",
@@ -146,7 +146,7 @@ class wos_bot(object):
         tstr = strftime("%y%m%d_%H:%M:%S", localtime())
         if not os.path.exists("pages/%s" % tstr[:6]):
             os.system("mkdir pages/%s" % tstr[:6])
-        fd = codecs.open("pages/%s/%s_%s.html" % (tstr[:6], tstr), 'w', 'utf-8', s)
+        fd = codecs.open("pages/%s/%s_%s.html" % (tstr[:6], tstr, s), 'w', 'utf-8')
         fd.write(self.data)
         fd.close()
 
