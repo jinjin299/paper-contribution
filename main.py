@@ -166,7 +166,7 @@ def project(line):
     the program will return False.
     """
     # Project Initialize
-    bot = wos_bot()
+    bot = wos_bot("korea")
     anal = analyzer()
     nobel, title, year = line.strip().split("\t")
     logging.info("#" * 50) 

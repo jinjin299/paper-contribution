@@ -56,24 +56,48 @@ class thread_bot(threading.Thread):
             self.data = "".join(datal)
 
 class wos_bot(object):
-    def __init__(self):
-        self.br = Browser()
-        self.br.set_handle_robots(False)
-        self.br.open("http://apps.webofknowledge.com")
-        self.br.select_form("roaming")
-        ID, PASS = open("id", 'r').read().split("\t")
-        self.br['username'] = ID
-        self.br['password'] = PASS
-        self.br.submit()
-        for link in self.br.links():
-            if link.text == 'continue and establish a new session':
-                self.br.follow_link(link)
-                break
+    def __init__(self, t=None):
+        if t == "korea":
+            self.br = Browser()
+            self.br.set_handle_robots(False)
+            self.br.open("http://medlib.korea.ac.kr/login")
+            self.br.select_form('login')
+            ID, PASS = open("id",'r').read().split("\t")
+            self.br['id'] = ID
+            self.br['password'] = PASS
+            self.br['loginType']=['2']
+            self.br.form.fixup()
+            self.br.submit()
+            self.br.open("http://apps.webofknowledge.com.ocam.korea.ac.kr")
+            self.br.select_form(nr=0)
+            self.br.submit()
+            self.br.open("http://medlib.korea.ac.kr/proxy/userinfo?returnurl=http%3A%2F%2Fapps%2Ewebofknowledge%2Ecom%2Eocam%2Ekorea%2Eac%2Ekr%2F")
+            self.br.select_form(nr=0)
+            self.br.submit()
+            self.br.select_form(nr=0)
+            self.br.submit()
+            for link in self.br.links():
+                if link.text=="Web of ScienceTM Core Collection":
+                    self.br.follow_link(link)
+                    break
+        else:
+            self.br = Browser()
+            self.br.set_handle_robots(False)
+            self.br.open("http://apps.webofknowledge.com")
+            self.br.select_form("roaming")
+            ID, PASS = open("id", 'r').read().split("\t")
+            self.br['username'] = ID
+            self.br['password'] = PASS
+            self.br.submit()
+            for link in self.br.links():
+                if link.text == 'continue and establish a new session':
+                    self.br.follow_link(link)
+                    break
 
-        for link in self.br.links():
-            if link.text=="Web of ScienceTM Core Collection":
-                self.br.follow_link(link)
-                break
+            for link in self.br.links():
+                if link.text=="Web of ScienceTM Core Collection":
+                    self.br.follow_link(link)
+                    break
 
     def nohigh(self):
         self.url = self.br.geturl()
