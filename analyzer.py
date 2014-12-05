@@ -92,7 +92,6 @@ class analyzer(object):
         d = d.replace(year, '')
         pat = re.compile('[^\d](\d{1,2})[^\d]')
         ml = pat.findall(d)
-        print ms
         if ms:
             if len(ml) == 1:
                 ds = ml[0]

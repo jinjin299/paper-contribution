@@ -80,7 +80,11 @@ def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset, recur=None):
         if not recur:
             for p in papers:
                 n += 1
-                paper = anal.extract_c(p)
+                try:
+                    paper = anal.extract_c(p)
+                except:
+                    bot.save("EXTRACT ERROR")
+                    paper = False
                 if paper:
                     logging.debug("IN PAGE EXTRACT : # %s", str(n))
                     Add_pe(origin, paper, sign, pset, eset)
