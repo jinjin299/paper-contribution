@@ -132,7 +132,7 @@ class wos_bot(object):
 
     def search(self, title, year=None):
         self.br.select_form("WOS_GeneralSearch_input_form")
-        padding = ' NOT "(vol 76, pg 1796, 1996)"'
+        padding = ' NOT "(vol 76, pg 1796, 1996)" NOT "and its interactions with antibiotics"'
         self.br.form['value(input1)'] = '"' + title + '"' + padding
         self.br['value(select1)'] = ['TI']
         if year:

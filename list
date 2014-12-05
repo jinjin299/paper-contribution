@@ -1,38 +1,74 @@
+# GROUP 1
 Phys1995_1	Detection of the Free Neutrino - Confirmation	1956
 Phys1995_2	Evidence for Anomalous Lepton Production in e+−e− Annihilation	1975
 Phys1997_1	Observation of Atoms Laser Cooled below the Doppler Limit	1988
 Phys1997_2	Laser Cooling below the One-Photon Recoil Energy by Velocity-Selective Coherent Population Trapping	1988
 Phys1997_3	3-dimensional viscous confinement and cooling of atoms by resonance radiation pressure	1985
 Phys1998_1	Two-Dimensional Magnetotransport in the Extreme Quantum Limit	1982
+# GROUP 2
 Phys2001_1	Observation of Bose-Einstein Condensation in a Dilute Atomic Vapor	1995
 Phys2001_2	Bose-Einstein Condensation in a Gas of Sodium Atoms	1995
-Phys2002_1	Evidence for x Rays From Sources Outside the Solar System	1962
+Phys2002_1	EVIDENCE FOR X-RAYS FROM SOURCES OUTSIDE SOLAR SYSTEM	1962
 Phys2002_2	Observation of a neutrino burst from the supernova SN1987A	1987
-Phys2002_3	Search for Neutrinos from the Sun	1968
+Phys2002_3	SEARCH FOR NEUTRINOS FROM SUN	1968
 Phys2005_1	Phase Coherent Vacuum-Ultraviolet to Radio Frequency Comparison with a Mode-Locked Laser	2000
 Phys2005_2	Direct Link between Microwave and Optical Frequencies with a 300 THz Femtosecond Laser Comb	2000
+# GROUP 3
 Phys2006_1	A preliminary measurement of the cosmic microwave background spectrum by the Cosmic Background Explorer (COBE) satellite	1990
 Phys2006_2	COBE Differential Microwave Radiometers: Instrument Design and Implementation	1990
 Phys2007_1	Giant Magnetoresistance of (001)Fe/(001)Cr Magnetic Superlattices	1988
 Phys2007_2	Layered Magnetic Structures: Evidence for Antiferromagnetic Coupling of Fe Layers across Cr Interlayers	1986
-Phys2008_1	Dynamical Model of Elementary Particles Based on an Analogy with Superconductivity. I	1961
+Phys2008_1	DYNAMICAL MODEL OF ELEMENTARY PARTICLES BASED ON AN ANALOGY WITH SUPERCONDUCTIVITY .1.	1961
 Phys2009_1	Dielectric-fibre surface waveguides for optical frequencies	1966
+# GROUP 4
 Phys2010_1	Electric Field Effect in Atomically Thin Carbon Films	2004
 Phys2011_1	Observational Evidence from Supernovae for an Accelerating Universe and a Cosmological Constant	1998
 Phys2012_1	Observing the Progressive Decoherence of the “Meter” in a Quantum Measurement	1996
 Phys2012_2	Generation of Nonclassical Motional States of a Trapped Atom	1996
 Phys2012_3	Measurements of Omega and Lambda from 42 High-Redshift Supernovae	1999
-Phys2013_1	Broken Symmetry and the Mass of Gauge Vector Mesons	1964
-Chem1998_1	The influence of polarization functions on molecular orbital hydrogenation energies	1973
+Phys2013_1	BROKEN SYMMETRY + MASS OF GAUGE VECTOR MESONS	1964
+# GROUP 5
+Chem1998_1	INFLUENCE OF POLARIZATION FUNCTIONS ON MOLECULAR-ORBITAL HYDROGENATION ENERGIES	1973
 Chem1998_2	Self-Consistent Equations Including Exchange and Correlation Effects	1965
 Chem2000_1	Synthesis of electrically conducting organic polymers: halogen derivatives of polyacetylene, (CH)x	1977
-Chem2001_1	The first practical method for asymmetric epoxidation	1980
+Chem2001_1	THE 1ST PRACTICAL METHOD FOR ASYMMETRIC EPOXIDATION	1980
 Chem2001_2	Synthesis of 2,2'-bis(diphenylphosphino)-1,1'-binaphthyl (BINAP), an atropisomeric chiral bis(triaryl)phosphine, and its use in the rhodium(I)-catalyzed asymmetric hydrogenation of .alpha.-(acylamino)acrylic acids	1980
 Chem2001_3	Catalytic asymmetric hydrogenation employing a soluble, optically active, rhodium complex	1968
-Chem2002_1	Solution conformation of proteinase inhibitor IIA from bull seminal plasma by 1H nuclear magnetic resonance and distance geometry.	1985
+# GROUP 6
+Chem2002_1	SOLUTION CONFORMATION OF PROTEINASE INHIBITOR-IIA FROM BULL SEMINAL PLASMA BY H-1 NUCLEAR MAGNETIC-RESONANCE AND DISTANCE GEOMETRY	1985
 Chem2002_2	Electrospray ionization for mass spectrometry of large biomolecules.	1989
 Chem2003_1	The Structure of the Potassium Channel: Molecular Basis of K+ Conduction and Selectivity	1998
 Chem2003_2	Appearance of Water Channels in Xenopus Oocytes Expressing Red Cell CHIP28 Protein	1992
-Chem2004_1	Proposed role of ATP in protein breakdown: conjugation of protein with multiple chains of the polypeptide of ATP-dependent proteolysis.	1980
+Chem2004_1	PROPOSED ROLE OF ATP IN PROTEIN BREAKDOWN - CONJUGATION OF PROTEINS WITH MULTIPLE CHAINS OF THE POLYPEPTIDE OF ATP-DEPENDENT PROTEOLYSIS	1980
 Chem2004_2	ATP-dependent conjugation of reticulocyte proteins with the polypeptide required for protein degradation.	1980
-Chem2005_1	Possible intermediate in the tungsten-catalyzed olefin metathesis reaction	1972
+# GROUP 7
+Chem2005_1	POSSIBLE INTERMEDIATE IN TUNGSTEN-CATALYZED OLEFIN METATHESIS REACTION	1972
+Chem2007_1	ADSORPTION OF HYDROGEN ON PALLADIUM SINGLE-CRYSTAL SURFACES	1974
+Chem2008_1	IMPROVED GREEN FLUORESCENCE	1995
+Chem2008_2	GREEN FLUORESCENT PROTEIN AS A MARKER FOR GENE-EXPRESSION	1994
+Chem2008_3	EXTRACTION, PURIFICATION AND PROPERTIES OF AEQUORIN, A BIOLUMINESCENT PROTEIN FROM LUMINOUS HYDROMEDUSAN, AEQUOREA	1962
+# GROUP 8
+Chem2009_1	Structure of functionally activated small ribosomal subunit at 3.3 angstrom resolution	2000
+Chem2009_2	The complete atomic structure of the large ribosomal subunit at 2.4 angstrom resolution	2000
+Chem2009_3	Structure of the 30S ribosomal subunit	2000
+Chem2010_1	NEW STEREOSPECIFIC CROSS-COUPLING BY THE PALLADIUM-CATALYZED REACTION OF 1-ALKENYLBORANES WITH 1-ALKENYL OR 1-ALKYNYL HALIDES	1979
+Chem2010_2	NOVEL STEREOSPECIFIC ALKENYL-ALKENYL CROSS-COUPLING BY A PALLADIUM-CATALYZED OR NICKEL-CATALYZED REACTION OF ALKENYLALANES WITH ALKENYL HALIDES	1976
+Chem2011_1	METALLIC PHASE WITH LONG-RANGE ORIENTATIONAL ORDER AND NO TRANSLATIONAL SYMMETRY	1984
+Chem2012_1	CLONING OF THE GENE AND CDNA FOR MAMMALIAN BETA-ADRENERGIC-RECEPTOR AND HOMOLOGY WITH RHODOPSIN	1986
+# GROUP 9
+Medi2006_1	Potent and specific genetic interference by double-stranded RNA in Caenorhabditis elegans	1998
+Medi2007_1	INSERTION OF DNA-SEQUENCES INTO THE HUMAN CHROMOSOMAL BETA-GLOBIN LOCUS BY HOMOLOGOUS RECOMBINATION	1985
+Medi2007_2	INTRODUCTION OF HOMOLOGOUS DNA-SEQUENCES INTO MAMMALIAN-CELLS INDUCES MUTATIONS IN THE COGNATE GENE	1986
+Medi2007_3	ESTABLISHMENT IN CULTURE OF PLURIPOTENTIAL CELLS FROM MOUSE EMBRYOS	1981
+Medi2008_1	ISOLATION OF HUMAN T-CELL LEUKEMIA-VIRUS IN ACQUIRED IMMUNE-DEFICIENCY SYNDROME (AIDS)	1983
+Medi2008_2	STRUCTURE AND TRANSCRIPTION OF HUMAN PAPILLOMAVIRUS SEQUENCES IN CERVICAL-CARCINOMA CELLS	1985
+# GROUP 10
+Medi2010_1	FERTILIZATION AND CLEAVAGE IN-VITRO OF PREOVULATOR HUMAN OOCYTES	1970
+Medi2011_1	IDENTIFICATION OF A NOVEL CELL TYPE IN PERIPHERAL LYMPHOID ORGANS OF MICE	1973
+Medi2011_2	The dorsoventral regulatory gene cassette spatzle/Toll/cactus controls the potent antifungal response in Drosophila adults	1996
+Medi2011_3	Defective LPS signaling in C3H/HeJ and C57BL/10ScCr mice: Mutations in Tlr4 gene	1998
+# GROUP 11
+Medi2012_1	Induction of pluripotent stem cells from mouse embryonic and adult fibroblast cultures by defined factors	2006
+Medi2013_1	SYNAPTOTAGMIN-I - A MAJOR CA2+ SENSOR FOR TRANSMITTER RELEASE AT A CENTRAL SYNAPSE	1994
+Medi2013_2	SNAP RECEPTORS IMPLICATED IN VESICLE TARGETING AND FUSION	1993
+Medi2013_3	IDENTIFICATION OF 23 COMPLEMENTATION GROUPS REQUIRED FOR POST-TRANSLATIONAL EVENTS IN THE YEAST SECRETORY PATHWAY	1980
