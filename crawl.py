@@ -32,20 +32,22 @@ class thread_bot(threading.Thread):
             paper = anal.extract(self.data)
             self.out_queue.put(paper)
         except:
-            self.stat_queue.put(sys.exc_info())
+            self.stat_queue.put([sys.exc_info(), self.getName()])
         self.queue.task_done()
 
     def save(self):
         tstr = strftime("%y%m%d_%H:%M:%S", localtime())
         if not os.path.exists("pages/%s" % tstr[:6]):
             os.system("mkdir pages/%s" % tstr[:6])
-        fd = codecs.open("pages/%s/%s.html" % (tstr[:6], tstr), 'w', 'utf-8')
+        fd = codecs.open("pages/%s/%s_%s.html" % (tstr[:6], tstr, self.getName()), 'w', 'utf-8')
         fd.write(self.data)
         fd.close()
 
     def nohigh(self):
         self.url = self.br.geturl()
         self.data = self.br.response().get_data().decode('utf-8', 'strict')
+        if "en_US.Server.IDLimit" in self.data:
+            raise Exception("Server Error")
         if '<span class="hitHilite">' in self.data:
             datal = self.data.split('<span class="hitHilite">')
             for i in range(len(datal) - 1):
@@ -81,6 +83,8 @@ class wos_bot(object):
     def nohigh(self):
         self.url = self.br.geturl()
         self.data = self.br.response().get_data().decode('utf-8', 'strict')
+        if "en_US.Server.IDLimit" in self.data:
+            raise Exception("Server Error")
         if '<span class="hitHilite">' in self.data:
             datal = self.data.split('<span class="hitHilite">')
             for i in range(len(datal) - 1):
@@ -92,6 +96,8 @@ class wos_bot(object):
         if (url_type == "paper"):
             link = paper.find('a', {'class' : 'smallV110'})
             if link:
+                if not "record" in str(link).split("do", 2)[0].lower():
+                    return False
                 return self.parse_url(link.get('href'))
         else:
             ttxt = {
@@ -136,7 +142,7 @@ class wos_bot(object):
         padding = ' NOT "(vol 76, pg 1796, 1996)"'
         self.br.form['value(input1)'] = '"' + title + '"' + padding
         self.br['value(select1)'] = ['TI']
-        if not year:
+        if year:
             self.br['period'] = ['Year Range']
             self.br['startYear'] = [year]
             self.br['endYear'] = [year]

@@ -2,6 +2,8 @@ import logging
 import re
 import codecs
 import Queue
+import sys
+import traceback
 from analyzer import analyzer
 from paper import paper4
 from crawl import wos_bot, thread_bot
@@ -16,14 +18,15 @@ def init():
 def Add_paper(paper, pset):
     if paper.pdate == None:
         logging.warning("Paper Date is None %s", paper.title)
+        raise Exception("Date is None")
     for pi in pset:
         if paper == pi:
             logging.debug("STRONG EQUAL : %s", paper.title)
             return False
         elif paper.weakeq(pi):
             fd = codecs.open("weak", 'a', 'utf-8')
-            fd.write(str(pi))
-            fd.write(str(paper))
+            fd.write(unicode(pi))
+            fd.write(unicode(paper))
             fd.write("="*50 + "\n")
             fd.close()
             logging.debug("WEAK EQUAL : %s", paper.title)
@@ -43,7 +46,7 @@ def write_data(nobel, nc, piset, eiset, mode='a'):
     pfd = codecs.open("data/" + nobel + ".paper4", mode, "utf-8")
     pfd.write("\n\n%d\n\n" % nc)
     for pi in piset:
-        pfd.write(str(pi))
+        pfd.write(unicode(pi))
     pfd.write("====")
     pfd.close()
 
@@ -79,26 +82,27 @@ def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset, recur=None):
             logging.debug("LEVEL %s-R : # %s", lv, str(n))
 
         ldict = {}
-        for p in papers:
-            n += 1
-            paper = anal.extract_c(p)
-            if paper:
-                logging.debug("IN PAGE EXTRACT : # %s", str(n))
-                Add_pe(origin, paper, sign, pset, eset)
-                continue
-
-            logging.debug("IN PAGE FAIL : # %s", str(n))
-            purl = bot.get_url("paper", p)
-            if "arXiv" in p.getText():
-                logging.warning("arXiv DATA")
-            if "[not available]" in p.getText(strip=True):
-                continue
-            elif not purl:
-                logging.error('ACCESS ERROR : %s', str(n))
-                continue
-            ldict[n] = purl
 
         if not recur:
+            for p in papers:
+                n += 1
+                paper = anal.extract_c(p)
+                if paper:
+                    logging.debug("IN PAGE EXTRACT : # %s", str(n))
+                    Add_pe(origin, paper, sign, pset, eset)
+                    continue
+
+                logging.debug("IN PAGE FAIL : # %s", str(n))
+                purl = bot.get_url("paper", p)
+                if "arXiv" in p.getText():
+                    logging.warning("arXiv DATA")
+                if "[not available]" in p.getText(strip=True):
+                    continue
+                elif not purl:
+                    logging.error('ACCESS ERROR : %s', str(n))
+                    continue
+                ldict[n] = purl
+
             queue = Queue.Queue()
             out_queue = Queue.Queue()
             stat_queue = Queue.Queue()
@@ -118,17 +122,32 @@ def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset, recur=None):
             except Queue.Empty:
                 pass
             else:
-                exc_type, exc_obj, exc_trace = exc
+                exc_type, exc_obj, exc_trace = exc[0]
                 print exc_type
                 print exc_obj
-                print exc_trace
+                traceback.print_tb(exc_trace)
+                print exc[1]
                 raise Exception("ERROR")
-
+            logging.debug("Thread_bot finished")
             for i in range(len(ldict)):
                 paper = out_queue.get()
                 Add_pe(origin, paper, sign, pset, eset)
 
         else:
+            for p in papers:
+                n += 1
+                purl = bot.get_url("paper", p)
+                if purl:
+                    ldict[n] = purl
+                    continue
+                else:
+                    paper = anal.extract_c(p)
+                    if paper:
+                        logging.debug("IN PAGE EXTRACT : # %s", str(n))
+                        Add_pe(origin, paper, sign, pset, eset)
+                    else:
+                        logging.error('ACCESS ERROR : %s', str(n))
+
             for ni in ldict:
                 bot.go_url(ldict[ni])
                 bot.save()
@@ -165,7 +184,7 @@ def project(line):
 
     papers = anal.list_papers(bot.data)
     if len(papers) != 1:
-        logging.error('INVALID SEARCH INPUT: %s (%s)', title, nobel)
+        logging.error('INVALID SEARCH INPUT: %s (%s) # %s', title, nobel, str(len(papers)))
         return False
 
     bot.go_url(bot.get_url("paper", papers[0]))
@@ -243,7 +262,7 @@ def project(line):
                 
         # Go to the list 
         Cite_or_ref(bot, anal, paper1, 1,
-                    "R", rurl, pset, eset, recur="R")
+                    "R", rurl, pset, eset)
         bot.save()
         Cite_or_ref(bot, anal, paper1, 3, "C", curl, pset, eset)
         bot.save()
@@ -275,8 +294,6 @@ def main():
     for line in open("list", 'r').readlines():
         if line.startswith("#"):
             continue
-        project(line)
-        break
         while True:
             try:
                 if not project(line):
@@ -284,19 +301,25 @@ def main():
                     logging.error("PROGRAM FALSE RESULT")
 
             except:
+                exc = sys.exc_info()
+                exc_type, exc_obj, exc_trace = exc
+                print exc_type
+                print exc_obj
+                traceback.print_tb(exc_trace)
                 logging.error("PROGRAM ERROR")
                 sleep(3)
             else:
                 break
 
 def test():
-    line = "Phys1995_1\tDetection of the Free Neutrino - Confirmation\t1956"
-    bot = wos_bot()
     anal = analyzer()
-    nobel, title, year = line.strip().split("\t")
-    bot.search(title, year)
-    for l in bot.br.links():
-        print l.text
-
+    fname = "pages/141130/141130_10:42:18.html"
+    data = codecs.open(fname, 'r', 'utf8').read()
+    pl = anal.list_papers(data)
+    for i in range(len(pl)):
+        if i != 12:
+            continue
+        print unicode(anal.extract_c(pl[i]))
+    
 if __name__ == '__main__':
     main()

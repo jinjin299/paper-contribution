@@ -26,9 +26,9 @@ class paper4(object):
         auth = "\n".join(self.authors)
         tmp = u"TITLE\n%s\n\nAUTHORS\n%s\n\nDATE\n%s\n\nLINK\n%s"
         tmps = tmp % (self.title, auth, self.dtos(), self.link)
-        self.md5 = md5.new(tmps).hexdigest()
+        self.md5 = md5.new(tmps.encode('utf-8')).hexdigest()
 
-    def __str__(self):
+    def __unicode__(self):
         auth = "\n".join(self.authors)
         tmp = u"TITLE\n%s\n\nAUTHORS\n%s\n\nDATE\n%s" \
                 + "\n\nCCNT\n%s\n\nLINK\n%s\n\nMD5\n%s"

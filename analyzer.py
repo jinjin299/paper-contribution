@@ -3,6 +3,7 @@ import re
 import os
 import string
 import codecs
+import logging
 from datetime import datetime
 from paper import paper4, paper5
 from bs4 import BeautifulSoup, element
@@ -22,12 +23,20 @@ class analyzer(object):
         seasons = {'SPR':'MAR', 'SUM':'JUN', 'FAL':'SEP', 'WIN':'DEC'}
         months = ["%02d"% i for i in range(1,13)]
 
-        d = dstr.replace('  ', ' ')
+        d = dstr.replace('  ', ' ').replace('- ', '-').replace(' -', '-').replace(',', '')
         ds = d.split(" ")
         if len(ds) == 1:
-            if "-" in d:
-
-                date = datetime.strptime(d, "%Y-%m")
+            if d.count("-") == 2:
+                date = datetime.strptime(d, "%Y-%b-%d")
+            elif "-" in d:
+                ds = d.split("-")
+                if (any(x in d for x in string.lowercase)
+                        or any(x in d for x in string.uppercase)):
+                    date = datetime.strptime(d, "%Y-%b")
+                elif len(ds[1]) == 4:
+                    date = datetime.strptime(ds[0], "%Y")
+                else:
+                    date = datetime.strptime(d, "%Y-%m")
             else:
                 date = datetime.strptime(d, "%Y")
         elif len(ds) == 2:
@@ -45,10 +54,12 @@ class analyzer(object):
                 d = " ".join(ds)
                 date = datetime.strptime(d, "%b %Y")
             
-        else:
+        elif len(ds) == 3:
             if (any(x in ds[1] for x in string.lowercase)
                     or any(x in ds[1] for x in string.uppercase)):
                 ds[1] = ds[1][:3]
+                if "-" in ds[0]:
+                    ds[0] = ds[0].split("-")[0]
                 d = " ".join(ds)
                 date = datetime.strptime(d, "%d %b %Y")
             elif (any(x in ds[0] for x in string.lowercase)
@@ -58,11 +69,65 @@ class analyzer(object):
                 date = datetime.strptime(d, "%b %d %Y")
             else:
                 date = datetime.strptime(d, "%m %d %Y")
+        else:
+            if "-" in d:
+                ds2 = d.split("-")
+                d = " ".join([ds2[0], ds[-1]])
+            else:
+                d = " ".join([ds[0], ds[1], ds[3]])
+            date = datetime.strptime(d, "%d %b %Y")
+        return date
+
+    def stod2(self, d):
+        bl = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        ms = None
+        for i in bl:
+            pat = re.compile(i, re.I)
+            if pat.search(d):
+                ms = i
+                break
+        pat = re.compile("\d{4}")
+        year = pat.search(d).group()
+        d = d.replace(year, '')
+        pat = re.compile('[^\d](\d{1,2})[^\d]')
+        ml = pat.findall(d)
+        print ms
+        if ms:
+            if len(ml) == 1:
+                ds = ml[0]
+                date = datetime.strptime(
+                        "%s %s %s" % (year, ms, ds), "%Y %b %d")
+            elif len(ml) == 0:
+                pat = re.compile('^(\d{1,2})[^\d]')
+                if pat.search(d):
+                    ds = pat.search(d).group(1)
+                    date = datetime.strptime(
+                            "%s %s %s" % (year, ms, ds), "%Y %b %d")
+                    return date
+                date = datetime.strptime(
+                        "%s %s" % (year, ms), "%Y %b")
+            else:
+                raise Exception("stod2 error")
+        else:
+            if len(ml) == 2:
+                ms = ml[0]
+                ds = ml[1]
+                date = datetime.strptime(
+                        "%s %s %s" % (year, ms, ds), "%Y %m %d")
+            elif len(ml) == 1:
+                ms = ml[0]
+                date = datetime.strptime(
+                        "%s %s" % (year, ms), "%Y %m")
+            elif len(ml) == 0:
+                date = datetime.strptime(year, "%Y")
+            else:
+                raise Exception("stod2 error")
         return date
 
     def extract_c(self, paper):
         cont = paper.find('span', {'class' : 'reference-title'})
-        pat = re.compile('(?<!Edited )By')
+        pat = re.compile('(?<!Edited )By:')
         if not cont:
             return False
         elif "Published:" not in paper.getText():
@@ -96,7 +161,11 @@ class analyzer(object):
                 break
             div = div.nextSibling
         d = div.getText(strip=True).split('Published:')[1].replace('.', '')
-        date = self.stod(d)
+        d = d.split("(")[0].strip()
+        try:
+            date = self.stod(d)
+        except:
+            date = self.stod2(d)
 
         cont = paper.find('div', {'class' : 'search-results-data'})
         ccnt = int(cont.find('a').contents[0].replace(',', ''))
@@ -122,13 +191,14 @@ class analyzer(object):
             for p in p_fields:
                 ptxt = p.getText(strip=True)
                 if ptxt.startswith("By:"):
-                    for i in ptxt[3:].split(";"):
-                        if "(" in i:
+                    for i in ptxt[3:].split("; "):
+                        if "Anonymous" in i:
+                            continue
+                        elif "(" in i:
                             name = i[i.index("(")+1:i.index(")")].strip()
                         else:
                             # No Parenthesis in name
-                            print i #debug
-                            exit(0)
+                            raise Exception("Author name %s" % i)
                         authors.append(name)
                     break
 
