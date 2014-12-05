@@ -31,6 +31,7 @@ class thread_bot(threading.Thread):
             paper = anal.extract(self.data)
             self.out_queue.put(paper)
         except:
+            self.save()
             self.stat_queue.put([sys.exc_info(), self.getName()])
         self.queue.task_done()
 

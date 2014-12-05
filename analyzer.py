@@ -164,11 +164,14 @@ class analyzer(object):
         try:
             date = self.stod(d)
         except:
-            date = self.stod2(d)
+            try:
+                date = self.stod2(d)
+            except:
+                date = datetime.today()
+            
 
         cont = paper.find('div', {'class' : 'search-results-data'})
         ccnt = int(cont.find('a').contents[0].replace(',', ''))
-
         return paper4(title, authors, date, False, ccnt)
 
 
@@ -224,7 +227,7 @@ class analyzer(object):
         if (not os.path.isfile(root + ".paper4")
                 or not os.path.isfile(root + ".edges")):
             logging.info("DATA ARE NOT EXIST")
-            return 0, 0, 0, set()
+            return 0, 0, set(), 1
         data = codecs.open(root + ".paper4", 'r', 'utf-8').read()
         edata = codecs.open(root + ".edges", 'r', 'utf-8').read()
         pset, eset, nset = set(), set(), set()

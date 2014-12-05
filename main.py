@@ -308,7 +308,7 @@ def main():
                 print exc_obj
                 traceback.print_tb(exc_trace)
                 logging.error("PROGRAM ERROR")
-                sleep(3)
+                sleep(2)
             else:
                 break
 
