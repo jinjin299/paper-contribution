@@ -148,7 +148,11 @@ def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset, recur=None):
 
             for ni in ldict:
                 bot.go_url(ldict[ni])
-                paper = anal.extract(bot.data)
+                try:
+                    paper = anal.extract(bot.data)
+                except:
+                    bot.save("EXTRACT_ERROR")
+                    raise Exception("Extraction Error")
                 logging.debug("INSDIE LINK EXTRACT : # %s", str(ni))
                 Add_pe(origin, paper, sign, pset, eset)
                 if recur:
