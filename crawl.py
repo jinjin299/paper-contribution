@@ -64,6 +64,11 @@ class wos_bot(object):
         self.br['username'] = ID
         self.br['password'] = PASS
         self.br.submit()
+        for link in self.br_links():
+            if link.text == 'continue and establish a new session':
+                self.br.follow_link(link)
+                break
+
         for link in self.br.links():
             if link.text=="Web of ScienceTM Core Collection":
                 self.br.follow_link(link)
