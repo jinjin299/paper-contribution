@@ -27,7 +27,6 @@ class thread_bot(threading.Thread):
             anal = analyzer()
             self.br.open(url)
             self.nohigh()
-            self.save()
             logging.debug("INSDIE LINK EXTRACT : # %s", str(ni))
             paper = anal.extract(self.data)
             self.out_queue.put(paper)
@@ -59,21 +58,11 @@ class wos_bot(object):
     def __init__(self):
         self.br = Browser()
         self.br.set_handle_robots(False)
-        self.br.open("http://medlib.korea.ac.kr/login")
-        self.br.select_form('login')
-        ID, PASS = open("id",'r').read().split("\t")
-        self.br['id'] = ID
+        self.br.open("http://apps.webofknowledge.com")
+        self.br.select_form("roaming")
+        ID, PASS = open("id", 'r').read().split("\t")
+        self.br['username'] = ID
         self.br['password'] = PASS
-        self.br['loginType']=['2']
-        self.br.form.fixup()
-        self.br.submit()
-        self.br.open("http://apps.webofknowledge.com.ocam.korea.ac.kr")
-        self.br.select_form(nr=0)
-        self.br.submit()
-        self.br.open("http://medlib.korea.ac.kr/proxy/userinfo?returnurl=http%3A%2F%2Fapps%2Ewebofknowledge%2Ecom%2Eocam%2Ekorea%2Eac%2Ekr%2F")
-        self.br.select_form(nr=0)
-        self.br.submit()
-        self.br.select_form(nr=0)
         self.br.submit()
         for link in self.br.links():
             if link.text=="Web of ScienceTM Core Collection":
@@ -84,7 +73,8 @@ class wos_bot(object):
         self.url = self.br.geturl()
         self.data = self.br.response().get_data().decode('utf-8', 'strict')
         if "en_US.Server.IDLimit" in self.data:
-            raise Exception("Server Error")
+            raise Exception("Server en_US.Server.IDLimit Error")
+
         if '<span class="hitHilite">' in self.data:
             datal = self.data.split('<span class="hitHilite">')
             for i in range(len(datal) - 1):
@@ -95,13 +85,11 @@ class wos_bot(object):
     def get_url(self, url_type, paper=None):
         if (url_type == "paper"):
             link = paper.find('a', {'class' : 'smallV110'})
-            if link:
-                if not "record" in str(link).split("do", 2)[0].lower():
-                    return False
+            if (link and
+                    ("record.do?product=WOS" in str(link).split("&", 2)[0].lower())):
                 return self.parse_url(link.get('href'))
         else:
-            ttxt = {
-                    "cite" : "View all of the articles that cite this one",
+            ttxt = {"cite" : "View all of the articles that cite this one",
                     "ref" : "View this record’s bibliography",
                     "next" : "Next Page"}[url_type]
             for link in self.br.links():
@@ -112,7 +100,7 @@ class wos_bot(object):
 
     def parse_url(self, url):
         if url.startswith("/"):
-            base_url = "http://apps.webofknowledge.com.ocam.korea.ac.kr"
+            base_url = "http://apps.webofknowledge.com"
         else:
             base_url = ""
         return base_url + url
@@ -122,7 +110,6 @@ class wos_bot(object):
             self.br.back()
         self.br.back()
         self.nohigh()
-
 
     def go_url(self, url):
         self.br.open(url)
@@ -149,14 +136,12 @@ class wos_bot(object):
         self.br.form.fixup()
         self.br.submit()
         self.nohigh()
-        self.br.open(self.url + "&action=changePageSize&pageSize=50")
-        self.nohigh()
 
-    def save(self):
+    def save(self, s=''):
         tstr = strftime("%y%m%d_%H:%M:%S", localtime())
         if not os.path.exists("pages/%s" % tstr[:6]):
             os.system("mkdir pages/%s" % tstr[:6])
-        fd = codecs.open("pages/%s/%s.html" % (tstr[:6], tstr), 'w', 'utf-8')
+        fd = codecs.open("pages/%s/%s_%s.html" % (tstr[:6], tstr), 'w', 'utf-8', s)
         fd.write(self.data)
         fd.close()
 

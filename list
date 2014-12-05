@@ -1,10 +1,10 @@
 #PSEUDO	Reactor neutrino experiments: theta(13) and beyond	2014
-#Phys1995_1	Detection of the Free Neutrino - Confirmation	1956
-#Phys1995_2	Evidence for Anomalous Lepton Production in e+−e− Annihilation	1975
-#Phys1997_1	Observation of Atoms Laser Cooled below the Doppler Limit	1988
-#Phys1997_2	Laser Cooling below the One-Photon Recoil Energy by Velocity-Selective Coherent Population Trapping	1988
-#Phys1997_3	3-dimensional viscous confinement and cooling of atoms by resonance radiation pressure	1985
-#Phys1998_1	Two-Dimensional Magnetotransport in the Extreme Quantum Limit	1982
+Phys1995_1	Detection of the Free Neutrino - Confirmation	1956
+Phys1995_2	Evidence for Anomalous Lepton Production in e+−e− Annihilation	1975
+Phys1997_1	Observation of Atoms Laser Cooled below the Doppler Limit	1988
+Phys1997_2	Laser Cooling below the One-Photon Recoil Energy by Velocity-Selective Coherent Population Trapping	1988
+Phys1997_3	3-dimensional viscous confinement and cooling of atoms by resonance radiation pressure	1985
+Phys1998_1	Two-Dimensional Magnetotransport in the Extreme Quantum Limit	1982
 Phys2001_1	Observation of Bose-Einstein Condensation in a Dilute Atomic Vapor	1995
 Phys2001_2	Bose-Einstein Condensation in a Gas of Sodium Atoms	1995
 Phys2002_1	Evidence for x Rays From Sources Outside the Solar System	1962

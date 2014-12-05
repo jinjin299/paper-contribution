@@ -9,11 +9,6 @@ from paper import paper4
 from crawl import wos_bot, thread_bot
 from time import sleep
 
-def init():
-    logging.basicConfig(
-        filename='log', level=logging.DEBUG,
-        format='%(asctime)s:%(name)s:%(levelname)s\t%(message)s')
-    logging.info("#"*30 + "PROGRAM START" + "#"*30)
 
 def Add_paper(paper, pset):
     if paper.pdate == None:
@@ -69,7 +64,6 @@ def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset, recur=None):
 
     bot.go_url(url)
     while True:
-        bot.save()
         papers = anal.list_papers(bot.data)
         if len(papers) == 0:
             logging.debug("NOT %s 2 : %s", sign, origin.title)
@@ -150,7 +144,6 @@ def Cite_or_ref(bot, anal, origin, lv, sign, url, pset, eset, recur=None):
 
             for ni in ldict:
                 bot.go_url(ldict[ni])
-                bot.save()
                 paper = anal.extract(bot.data)
                 logging.debug("INSDIE LINK EXTRACT : # %s", str(ni))
                 Add_pe(origin, paper, sign, pset, eset)
@@ -177,18 +170,19 @@ def project(line):
     anal = analyzer()
     nobel, title, year = line.strip().split("\t")
     logging.info("#" * 50) 
-    logging.info('START : %s\t%s', nobel, title)
+    logging.info('START : %s\t%s', nobel)
     bot.search(title, year)
     logging.info('SEARCH : %s\t%s', title, year)
-    bot.save()
 
     papers = anal.list_papers(bot.data)
     if len(papers) != 1:
-        logging.error('INVALID SEARCH INPUT: %s (%s) # %s', title, nobel, str(len(papers)))
+        logging.error('INVALID SEARCH : %s (%s) NUM :# %s', title, nobel, str(len(papers)))
+        bot.save("INVALID_SEARCH")
         return False
 
     bot.go_url(bot.get_url("paper", papers[0]))
-    bot.save()
+    bot.save("ORIGIN_PAPER")
+
     droot = anal.extract(bot.data)
     curl = bot.get_url("cite")
     rurl = bot.get_url("ref")
@@ -197,6 +191,7 @@ def project(line):
     if not curl:
         logging.error("NOT CITED : NO URL : %s (%s)", title, nobel)
         return False
+
     bot.go_url(curl)
     bot.save()
     papers = anal.list_papers(bot.data)
@@ -205,11 +200,11 @@ def project(line):
         return False
 
     bot.go_url(bot.get_url("paper", papers[0]))
-    curl = bot.url
+    curl = bot.br.geturl()
     
     # Check Previous Data
     logging.info("CHECK PREVIOUS DATA")
-    pset, eset, nmax = anal.Check_data(nobel)
+    pset, eset, nset, nmax = anal.Check_data(nobel)
     """
     pset : set of papers
     eset : set of edges
@@ -218,7 +213,7 @@ def project(line):
     bot.go_n(nmax)
     
     paper = anal.extract(bot.data)
-    if paper in pset:
+    if paper in nset:
     # Continue previous result
         nc = nmax
         logging.info('RESTART : %s with last record # %s', nobel, str(nc))
@@ -243,11 +238,11 @@ def project(line):
         write_data(nobel, 0, pset, eset, "w")
         bot.go_url(curl)
 
+    del nset
     while True:
         nc += 1
-        logging.debug("LEVEL 2-C : %s / %s", str(nc), str(droot.ccnt))
+        logging.info("LEVEL 2-C : %s / %s", str(nc), str(droot.ccnt))
         pset, eset = set(), set()
-        bot.save()
         paper1 = anal.extract(bot.data)
         if not paper1:
             logging.info("INVALID NEXT")
@@ -263,9 +258,7 @@ def project(line):
         # Go to the list 
         Cite_or_ref(bot, anal, paper1, 1,
                     "R", rurl, pset, eset)
-        bot.save()
         Cite_or_ref(bot, anal, paper1, 3, "C", curl, pset, eset)
-        bot.save()
         write_data(nobel, nc, pset, eset)
 
         # Go to the next paper page
@@ -282,24 +275,32 @@ def project(line):
     return True
 
 
+def init():
+    logging.basicConfig(
+        filename='log', level=logging.DEBUG,
+        format='%(asctime)s:%(name)s:%(levelname)s\t%(message)s')
+    for i in range(3):
+        logging.info("#" * 50)
+    logging.info("PROGRAM INITILIZATION")
+
 def main():
     """
     Initialize basic element and parse list of article 
     and run a function to crawl and extract paper data
     """
     init()
-    
+    logging.info("READ LIST FILE")
     logging.info("READ LIST")
-
     for line in open("list", 'r').readlines():
         if line.startswith("#"):
+            logging.info("IGNORE : %s", line.strip())
             continue
+
         while True:
             try:
                 if not project(line):
                     logging.error("#" * 50)
                     logging.error("PROGRAM FALSE RESULT")
-
             except:
                 exc = sys.exc_info()
                 exc_type, exc_obj, exc_trace = exc

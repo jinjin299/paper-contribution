@@ -228,11 +228,10 @@ class analyzer(object):
         if (not os.path.isfile(root + ".paper4")
                 or not os.path.isfile(root + ".edges")):
             logging.info("DATA ARE NOT EXIST")
-            return set(), 0, 0
+            return set(), 0, 0, 0
         data = codecs.open(root + ".paper4", 'r', 'utf-8').read()
         edata = codecs.open(root + ".edges", 'r', 'utf-8').read()
-        pset, eset = set(), set()
-        cont = ""
+        pset, eset, nset = set(), set(), set()
         nmax = 0 
         pat = re.compile("\n\n(\d+?)\n\n(.+?\n{5})====", re.DOTALL)
         pat2 = re.compile(
@@ -241,9 +240,9 @@ class analyzer(object):
         # Parse existing data and eset pset
         for i in pat.finditer(data):
             ni = int(i.group(1))
+            nset = set()
             if ni > nmax:
                 nmax = ni
-                cont = i.group(2)
             for j in pat2.finditer(i.group()):
                 title = j.group(1)
                 authors = [x.strip() for x in j.group(2).split("\n")
@@ -252,10 +251,12 @@ class analyzer(object):
                 ccnt = int(j.group(4))
                 link = self.str_to_bool(j.group(5))
                 md5 = j.group(6)
-                pset.add(paper4(title, authors, pdate, link, ccnt))
+                paper = paper4(title, authors, pdate, link, ccnt)
+                pset.add(paper)
+                nset.add(paper)
 
         for i in pat.finditer(edata):
             for j in [x.strip() for x in i.group(2).split("\n") if x != '']:
                 eset.add(j)
 
-        return pset, eset, nmax
+        return pset, eset, nset, nmax
