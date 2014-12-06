@@ -42,8 +42,9 @@ class analyzer(object):
         elif len(ds) == 2:
             if "-" in d:
                 d = d.split("-", 1)[0] + u" " + ds[1]
+                ds = d.split(" ")
 
-            elif ds[0] in seasons:
+            if ds[0] in seasons:
                 d = seasons[ds[0]] + u" " + ds[1]
 
             ds = d.split(" ")
@@ -92,36 +93,39 @@ class analyzer(object):
         d = d.replace(year, '')
         pat = re.compile('[^\d](\d{1,2})[^\d]')
         ml = pat.findall(d)
-        if ms:
-            if len(ml) == 1:
-                ds = ml[0]
-                date = datetime.strptime(
-                        "%s %s %s" % (year, ms, ds), "%Y %b %d")
-            elif len(ml) == 0:
-                pat = re.compile('^(\d{1,2})[^\d]')
-                if pat.search(d):
-                    ds = pat.search(d).group(1)
+        try:
+            if ms:
+                if len(ml) == 1:
+                    ds = ml[0]
                     date = datetime.strptime(
                             "%s %s %s" % (year, ms, ds), "%Y %b %d")
-                    return date
-                date = datetime.strptime(
-                        "%s %s" % (year, ms), "%Y %b")
+                elif len(ml) == 0:
+                    pat = re.compile('^(\d{1,2})[^\d]')
+                    if pat.search(d):
+                        ds = pat.search(d).group(1)
+                        date = datetime.strptime(
+                                "%s %s %s" % (year, ms, ds), "%Y %b %d")
+                        return date
+                    date = datetime.strptime(
+                            "%s %s" % (year, ms), "%Y %b")
+                else:
+                    raise Exception("stod2 error")
             else:
-                raise Exception("stod2 error")
-        else:
-            if len(ml) == 2:
-                ms = ml[0]
-                ds = ml[1]
-                date = datetime.strptime(
-                        "%s %s %s" % (year, ms, ds), "%Y %m %d")
-            elif len(ml) == 1:
-                ms = ml[0]
-                date = datetime.strptime(
-                        "%s %s" % (year, ms), "%Y %m")
-            elif len(ml) == 0:
-                date = datetime.strptime(year, "%Y")
-            else:
-                raise Exception("stod2 error")
+                if len(ml) == 2:
+                    ms = ml[0]
+                    ds = ml[1]
+                    date = datetime.strptime(
+                            "%s %s %s" % (year, ms, ds), "%Y %m %d")
+                elif len(ml) == 1:
+                    ms = ml[0]
+                    date = datetime.strptime(
+                            "%s %s" % (year, ms), "%Y %m")
+                elif len(ml) == 0:
+                    date = datetime.strptime(year, "%Y")
+                else:
+                    raise Exception("stod2 error")
+        except:
+            return datetime.strptime(year, "%Y")
         return date
 
     def extract_c(self, paper):
@@ -205,7 +209,10 @@ class analyzer(object):
                     ptxt = p.getText(strip=True)
                     if ptxt.startswith("Published:"):
                         d = p.find('value').contents[0].replace('.', '')
-                        date = self.stod(d)
+                        try:
+                            date = self.stod(d)
+                        except:
+                            date = self.stod2(d)
                         break
         if tn == 4: 
             return paper4(title, authors, date, True, ccnt)
