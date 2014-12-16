@@ -174,7 +174,7 @@ def project(line):
     the program will return False.
     """
     # Project Initialize
-    bot = wos_bot("korea")
+    bot = wos_bot()
     anal = analyzer()
     nobel, title, year = line.strip().split("\t")
     logging.info("#" * 50) 
@@ -299,7 +299,7 @@ def main():
     init()
     logging.info("READ LIST FILE")
     logging.info("READ LIST")
-    for line in open("list", 'r').readlines():
+    for line in open("rlist2", 'r').readlines():
         if line.startswith("#"):
             logging.info("IGNORE : %s", line.strip())
             continue

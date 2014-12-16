@@ -227,9 +227,9 @@ class analyzer(object):
         else:
             return False
 
-    def Check_data(self, nobel):
+    def Check_data(self, nobel, root="data/"):
         # No Check
-        root = "data/" + nobel
+        root = root + nobel
         if (not os.path.isfile(root + ".paper4")
                 or not os.path.isfile(root + ".edges")):
             logging.info("DATA ARE NOT EXIST")
